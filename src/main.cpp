@@ -132,7 +132,7 @@ int main() {
     bg_map.reload_cells_ref();
     while (true) {
         bg_map_ptr->update();
-        //bg_map.reload_cells_ref();
+        bg_map.reload_cells_ref();
         bn::core::update();
     }
 }
