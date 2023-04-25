@@ -28,15 +28,27 @@ with Image.open("animacion/mapa_prueba.bmp") as img:
 
             for id, tile in enumerate(tiles):
                 if igual(tile,tileActual):
-                    print("coincidencia")
+                    #print("coincidencia")
+                    mapa.append(id)
                     break
             else:
+                mapa.append(len(tiles))
                 tiles.append(tileActual)
             #tileActual.save(f"imagenes/{i}-{j}.bmp")
 
     b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
+    
     inicio = time.time()
     z = igual(img, img)
     fin = time.time()
     print(fin-inicio)
+    print(ancho)
+    
+    cont = 0
+    print(len(tiles))
+    for i, id in enumerate(mapa):
+        if i % ancho == 0:
+            print()
+        print(id, end=",")
+    print()
