@@ -11,6 +11,7 @@ def igual(img1, img2):
     else:
         return False
 
+
 def crearTiles(img):
     alto = img.height//8
     ancho = img.width//8
@@ -23,12 +24,21 @@ def crearTiles(img):
                 tiles.append(tileActual)
 
             for id, tile in enumerate(tiles):
-                if igual(tile,tileActual):
+                if igual(tile, tileActual):
                     mapa.append(id)
                     break
             else:
                 mapa.append(len(tiles))
                 tiles.append(tileActual)
+
+
+def guardarTilemap():
+    tilemap = Image.new(mode="RGB", size=(len(tiles) * 8, 8))
+    for i, tile in enumerate(tiles):
+        tilemap.paste(tile, ((i*8), 0))
+    tilemap = tilemap.convert("P", palette=Image.Palette.ADAPTIVE, colors=16)
+    tilemap.save("graphics/tiles2.bmp")
+
 
 tiles = []
 mapa = []
@@ -36,20 +46,15 @@ mapa = []
 with Image.open("animacion/mapa_prueba.bmp") as img:
     b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
-    
+
     inicio = time.time()
     crearTiles(img)
     fin = time.time()
+    guardarTilemap()
     print(fin-inicio)
-    
+
     cont = 0
     print(len(tiles))
-
-    tilemap = Image.new(mode="RGB",size=(len(tiles) * 8,8))
-    for i, tile in enumerate(tiles):
-        tilemap.paste(tile,((i*8),0))
-    tilemap = tilemap.convert("P", palette=Image.Palette.ADAPTIVE, colors=16)
-    tilemap.save("graphics/tiles2.bmp")
 
     for i, id in enumerate(mapa):
         if i % 16 == 0:
