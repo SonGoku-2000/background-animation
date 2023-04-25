@@ -32,12 +32,24 @@ def crearTiles(img):
                 tiles.append(tileActual)
 
 
-def guardarTilemap():
+def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion=""):
+    if(bpp == 4):
+        colores = 16
+    if(bpp == 8):
+        colores = 256
+
     tilemap = Image.new(mode="RGB", size=(len(tiles) * 8, 8))
     for i, tile in enumerate(tiles):
         tilemap.paste(tile, ((i*8), 0))
-    tilemap = tilemap.convert("P", palette=Image.Palette.ADAPTIVE, colors=16)
-    tilemap.save("graphics/tiles2.bmp")
+    tilemap = tilemap.convert("P", palette=Image.Palette.ADAPTIVE, colors=colores)
+    tilemap.save(path+".bmp")
+
+    with open(path + '.json', 'w') as archivoJson:
+        archivoJson.write('{\n')
+        archivoJson.write('    "type": "regular_bg_tiles",\n')
+        archivoJson.write(f'    "bpp_mode": {bpp}\n')
+        archivoJson.write(f'    "compression": {compresion}\n')
+        archivoJson.write('}\n')
 
 
 tiles = []
