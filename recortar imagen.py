@@ -11,11 +11,7 @@ def igual(img1, img2):
     else:
         return False
 
-
-tiles = []
-mapa = []
-
-with Image.open("animacion/mapa_prueba.bmp") as img:
+def crearTiles(img):
     alto = img.height//8
     ancho = img.width//8
 
@@ -28,27 +24,37 @@ with Image.open("animacion/mapa_prueba.bmp") as img:
 
             for id, tile in enumerate(tiles):
                 if igual(tile,tileActual):
-                    #print("coincidencia")
                     mapa.append(id)
                     break
             else:
                 mapa.append(len(tiles))
                 tiles.append(tileActual)
-            #tileActual.save(f"imagenes/{i}-{j}.bmp")
 
+tiles = []
+mapa = []
+
+with Image.open("animacion/mapa_prueba.bmp") as img:
     b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
     
     inicio = time.time()
-    z = igual(img, img)
+    crearTiles(img)
     fin = time.time()
     print(fin-inicio)
-    print(ancho)
     
     cont = 0
     print(len(tiles))
+
+    tilemap = Image.new(mode="RGB",size=(len(tiles) * 8,8))
+    for i, tile in enumerate(tiles):
+        tilemap.paste(tile,((i*8),0))
+    tilemap = tilemap.convert("P", palette=Image.Palette.ADAPTIVE, colors=16)
+    tilemap.save("graphics/tiles2.bmp")
+
     for i, id in enumerate(mapa):
-        if i % ancho == 0:
+        if i % 16 == 0:
             print()
         print(id, end=",")
     print()
+
+print(1024**0.5)
