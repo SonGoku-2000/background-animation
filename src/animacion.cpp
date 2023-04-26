@@ -2,6 +2,8 @@
 
 
 #include "bn_memory.h"
+
+#include "bn_log.h"
 namespace anim {
 
     Animacion::Animacion(int wait_updates):
@@ -22,11 +24,19 @@ namespace anim {
             return;
         }
         cont = 1;
-        if (cells[0] == 0) {
+
+        if(frameActual == 1){
             bn::memory::copy(patron1[0], cells_count, cells[0]);
-        }
-        else {
+        }else if(frameActual == 2){
             bn::memory::copy(patron2[0], cells_count, cells[0]);
+        }else{
+            BN_LOG("error frame no contavilizado");
+        }
+
+        frameActual ++;
+
+        if(frameActual > framesTotales){
+            frameActual = 1;
         }
 
         bg_map.reload_cells_ref();

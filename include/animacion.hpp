@@ -108,6 +108,10 @@ namespace anim {
 
         int cont = 1;
 
+        int frameActual = 1;
+
+        int framesTotales = 2;
+
         Animacion(int wait_updates);
 
         alignas(int) bn::regular_bg_map_cell cells[cells_count];
