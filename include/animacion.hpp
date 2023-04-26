@@ -1,8 +1,6 @@
 #ifndef ANIMACION_HPP
 #define ANIMACION_HPP
 
-#include "bn_core.h"
-#include "bn_keypad.h"
 #include "bn_memory.h"
 #include "bn_regular_bg_ptr.h"
 #include "bn_regular_bg_item.h"
@@ -101,21 +99,6 @@ namespace anim {
         0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
     };
 
-    struct bg_map {
-        static constexpr int columns = 32;
-        static constexpr int rows = 32;
-        static constexpr int cells_count = columns * rows;
-
-        alignas(int) bn::regular_bg_map_cell cells[cells_count];
-        bn::regular_bg_map_item map_item;
-
-        bg_map();
-
-        void update();
-
-        void reset();
-    };
-
     struct Animacion {
         static constexpr int columns = 32;
         static constexpr int rows = 32;
@@ -131,6 +114,8 @@ namespace anim {
         bn::regular_bg_item bg_item;
 
         bn::regular_bg_ptr bg;
+
+        bn::regular_bg_map_ptr bg_map;
 
         void update();
 
