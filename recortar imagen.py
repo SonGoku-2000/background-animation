@@ -32,7 +32,7 @@ def crearTiles(img):
                 tiles.append(tileActual)
 
 
-def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion=""):
+def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion="none"):
     if(bpp == 4):
         colores = 16
     if(bpp == 8):
@@ -47,8 +47,8 @@ def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion=""):
     with open(path + '.json', 'w') as archivoJson:
         archivoJson.write('{\n')
         archivoJson.write('    "type": "regular_bg_tiles",\n')
-        archivoJson.write(f'    "bpp_mode": {bpp}\n')
-        archivoJson.write(f'    "compression": {compresion}\n')
+        archivoJson.write(f'    "bpp_mode": "bpp_{bpp}",\n')
+        archivoJson.write(f'    "compression": "{compresion}"\n')
         archivoJson.write('}\n')
 
 
