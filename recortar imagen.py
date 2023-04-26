@@ -68,7 +68,54 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
 tiles = []
 mapa = []
 
-debug = True
+debug = False
+"""
+42 4D 96 00  00 00 00 00  00 00 76 00  00 00 28 00  
+00 00                                          
+      10 00  00 tamano imagen 1ro 2do 3ro 
+                00  espacio
+                    08 00 00 tamano imagen1ro 2do 3ro 
+                             00 01 00 04  00 00 00  ni idea
+00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00  ni idea
+00 00 00 00  00 00 ni idea
+
+1ro 2do 3ro 
+
+paleta
+
+                   FF FF  00 00 00 00  00 00 31 39  
+66 00 30 6F  8A 00 3B 56  8F 00 11 11  11 00 33 33  
+33 00 55 55  55 00 00 00  00 00 00 00  00 00 00 00  
+00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  
+00 00 FF FF  FF 00
+
+imagen 
+ultimopixel 
+primerpixel
+
+"""
+
+'''with open("imagen4bit.bmp","rb") as img:
+    datos1 =  str(img.readline())
+    datos1 = datos1.split("\\")
+    for i,valor in enumerate(datos1):
+        if (i%8 ==0):
+            print()
+        print(valor,end=" ")
+
+print()'''
+
+"""with open("tiles2.bmp","b+r") as img:
+    datos2 =  str(img.readline())
+
+    for i,valor in enumerate(datos2[4:]):
+        if (i%16 ==0):
+            print()
+        print(valor,end="")"""
+print()
+
+#with open("graphics/tiles2_palette.bmp","b+r") as img:
+#    print(img.readlines())
 
 with Image.open("animacion/mapa_prueba.bmp") as img:
     b = img.crop((0, 0, 8, 8))
