@@ -21,10 +21,8 @@
 int main() {
     bn::core::init();
 
-    anim::bg_map bg_map_ptr = anim::bg_map();
-    bn::regular_bg_item bg_item(
-        bn::regular_bg_tiles_items::tiles, bn::bg_palette_items::palette, bg_map_ptr.map_item);
-    bn::regular_bg_ptr bg = bg_item.create_bg(0, 0);
+    anim::Animacion bg_map_ptr = anim::Animacion(2);
+    bn::regular_bg_ptr bg = bg_map_ptr.bg_item.create_bg(0, 0);
     bn::regular_bg_map_ptr bg_map = bg.map();
 
     bg_map.reload_cells_ref();

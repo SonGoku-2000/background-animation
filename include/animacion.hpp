@@ -30,7 +30,7 @@ constexpr bn::regular_bg_map_cell frame[] = {
 3,3,3,3,3,5,3,3,3,4,3,3,3,3,10,3,
 3,3,3,3,3,5,3,3,3,4,3,3,3,3,10,3 };
 
-namespace anim{
+namespace anim {
     constexpr bn::regular_bg_map_cell patron1[] = {
         1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
         0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
@@ -114,6 +114,26 @@ namespace anim{
         void update();
 
         void reset();
+    };
+
+    struct Animacion {
+        static constexpr int columns = 32;
+        static constexpr int rows = 32;
+        static constexpr int cells_count = columns * rows;
+
+        int wait;
+
+        Animacion(int wait_updates);
+
+        alignas(int) bn::regular_bg_map_cell cells[cells_count];
+        bn::regular_bg_map_item map_item;
+
+        bn::regular_bg_item bg_item;
+
+        void update();
+
+        void reset();
+
     };
 }
 #endif
