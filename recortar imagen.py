@@ -55,6 +55,8 @@ def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion="none"):
 tiles = []
 mapa = []
 
+debug = True
+
 with Image.open("animacion/mapa_prueba.bmp") as img:
     b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
@@ -68,10 +70,10 @@ with Image.open("animacion/mapa_prueba.bmp") as img:
     cont = 0
     print(len(tiles))
 
-    for i, id in enumerate(mapa):
-        if i % 16 == 0:
-            print()
-        print(id, end=",")
+    if debug:
+        for i, id in enumerate(mapa):
+            if i % 16 == 0:
+                print()
+            print(id, end=",")
     print()
-
-print(1024**0.5)
+    print(f"Tiles totales: {len(tiles)}")
