@@ -17,6 +17,11 @@ namespace anim {
     }
 
     void Animacion::update() {
+        if (cont < wait){
+            cont ++;
+            return;
+        }
+        cont = 1;
         if (cells[0] == 0) {
             bn::memory::copy(patron1[0], cells_count, cells[0]);
         }

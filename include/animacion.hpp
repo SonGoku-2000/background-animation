@@ -106,6 +106,8 @@ namespace anim {
 
         int wait;
 
+        int cont = 1;
+
         Animacion(int wait_updates);
 
         alignas(int) bn::regular_bg_map_cell cells[cells_count];

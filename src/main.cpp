@@ -12,7 +12,7 @@
 int main() {
     bn::core::init();
 
-    anim::Animacion bg_map_ptr = anim::Animacion(2);
+    anim::Animacion bg_map_ptr = anim::Animacion(10);
     
     while (true) {
         bg_map_ptr.update();
