@@ -117,8 +117,47 @@ print()
 #with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
-with Image.open("animacion/mapa_prueba.bmp") as img:
-    b = img.crop((0, 0, 8, 8))
+with Image.open("graphics/tiles2_palette.bmp") as img:
+    arr = np.asarray(img)
+    #print(arr)
+    #print(img.getpalette()[:16*3])
+
+    primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
+    primeraParte = primeraParte.split()
+
+    for i, valor in enumerate(primeraParte):
+        primeraParte[i] = "0x"+valor
+        primeraParte[i] = int(primeraParte[i],16)
+    print(int("0x100",16))
+
+    tamano = []
+
+    alto = hex(img.height)
+    alto = hex(255)
+    alto = alto[2:]
+    
+    if len(alto) < 6:
+        print(f"{'0'*(6-len(alto))}desigual")
+        alto = f"{'0'*(6-len(alto))}{alto}"
+    #if len(ancho )% 2!= 0:
+    #    print("impar")
+    #    ancho = f"0{ancho}"
+
+    aux = ""
+    for i, letra in enumerate(alto):
+        print(i)
+        aux += letra
+        if i != 0 and (i+1) % 2 == 0:
+            tamano.append(aux)
+            aux = ""
+        
+    print(alto)
+    print(tamano)
+
+    num = [int("0xff",16)]
+    with open("archivo.bmp","wb") as f:
+        f.write(bytearray(primeraParte))
+    """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
     inicio = time.time()
@@ -136,4 +175,4 @@ with Image.open("animacion/mapa_prueba.bmp") as img:
                 print()
             print(id, end=",")
     print()
-    print(f"Tiles totales: {len(tiles)}")
+    print(f"Tiles totales: {len(tiles)}")"""
