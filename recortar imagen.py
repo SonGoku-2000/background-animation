@@ -141,7 +141,6 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
 
     aux = ""
     for i, letra in enumerate(alto):
-        print(i)
         aux += letra
         if i != 0 and (i+1) % 2 == 0:
             tamano.append(aux)
@@ -156,7 +155,6 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
 
     aux = ""
     for i, letra in enumerate(ancho):
-        print(i)
         aux += letra
         if i != 0 and (i+1) % 2 == 0:
             tamano.append(aux)
@@ -171,11 +169,17 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
     segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
     segundaParte = segundaParte.split()
 
+    for i, valor in enumerate(segundaParte):
+        segundaParte[i] = "0x"+valor
+        segundaParte[i] = int(segundaParte[i],16)
+    
+    print(segundaParte)
 
     num = [int("0xff",16)]
     with open("archivo.bmp","wb") as f:
         f.write(bytearray(primeraParte))
         f.write(bytearray(tamano))
+        f.write(bytearray(segundaParte))
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
