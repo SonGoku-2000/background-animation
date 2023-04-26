@@ -137,11 +137,7 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
     alto = alto[2:]
     
     if len(alto) < 6:
-        print(f"{'0'*(6-len(alto))}desigual")
         alto = f"{'0'*(6-len(alto))}{alto}"
-    #if len(ancho )% 2!= 0:
-    #    print("impar")
-    #    ancho = f"0{ancho}"
 
     aux = ""
     for i, letra in enumerate(alto):
@@ -150,7 +146,23 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
         if i != 0 and (i+1) % 2 == 0:
             tamano.append(aux)
             aux = ""
-        
+    tamano.append("00")
+
+    ancho = hex(img.width)
+    ancho = ancho[2:]
+
+    if len(ancho) < 6:
+        ancho = f"{'0'*(6-len(ancho))}{ancho}"
+
+    aux = ""
+    for i, letra in enumerate(ancho):
+        print(i)
+        aux += letra
+        if i != 0 and (i+1) % 2 == 0:
+            tamano.append(aux)
+            aux = ""
+
+    print(ancho)
     print(alto)
     print(tamano)
 
