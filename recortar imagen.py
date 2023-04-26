@@ -32,7 +32,7 @@ def crearTiles(img):
                 tiles.append(tileActual)
 
 
-def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion="none"):
+def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
     if(bpp == 4):
         colores = 16
     if(bpp == 8):
@@ -41,7 +41,8 @@ def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion="none"):
     tilemap = Image.new(mode="RGB", size=(len(tiles) * 8, 8))
     for i, tile in enumerate(tiles):
         tilemap.paste(tile, ((i*8), 0))
-    tilemap = tilemap.convert("P", palette=Image.Palette.ADAPTIVE, colors=colores)
+    tilemap = tilemap.convert(
+        "P", palette=Image.Palette.ADAPTIVE, colors=colores)
     tilemap.save(path+".bmp")
 
     with open(path + '.json', 'w') as archivoJson:
@@ -49,6 +50,18 @@ def guardarTilemap(path = "graphics/tiles2",bpp = 4,compresion="none"):
         archivoJson.write('    "type": "regular_bg_tiles",\n')
         archivoJson.write(f'    "bpp_mode": "bpp_{bpp}",\n')
         archivoJson.write(f'    "compression": "{compresion}"\n')
+        archivoJson.write('}\n')
+
+    paleta = tiles[0]
+    paleta = paleta.convert(
+        "P", palette=Image.Palette.ADAPTIVE, colors=colores)
+    paleta.save(path+"_palette.bmp")
+
+    with open(path + '_palette.json', 'w') as archivoJson:
+        archivoJson.write('{\n')
+        archivoJson.write('    "type": "bg_palette",\n')
+        archivoJson.write(f'    "bpp_mode": "bpp_{bpp}",\n')
+        archivoJson.write(f'    "colors_count": {colores}\n')
         archivoJson.write('}\n')
 
 
