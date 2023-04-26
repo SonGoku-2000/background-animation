@@ -130,6 +130,8 @@ namespace anim {
 
         bn::regular_bg_item bg_item;
 
+        bn::regular_bg_ptr bg;
+
         void update();
 
         void reset();
