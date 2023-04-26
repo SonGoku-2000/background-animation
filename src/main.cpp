@@ -21,7 +21,7 @@
 int main() {
     bn::core::init();
 
-    bg_map bg_map_ptr = bg_map();
+    anim::bg_map bg_map_ptr = anim::bg_map();
     bn::regular_bg_item bg_item(
         bn::regular_bg_tiles_items::tiles, bn::bg_palette_items::palette, bg_map_ptr.map_item);
     bn::regular_bg_ptr bg = bg_item.create_bg(0, 0);

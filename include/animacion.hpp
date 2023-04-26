@@ -30,7 +30,7 @@ constexpr bn::regular_bg_map_cell frame[] = {
 3,3,3,3,3,5,3,3,3,4,3,3,3,3,10,3,
 3,3,3,3,3,5,3,3,3,4,3,3,3,3,10,3 };
 
-namespace {
+namespace anim{
     constexpr bn::regular_bg_map_cell patron1[] = {
         1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
         0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
@@ -109,23 +109,11 @@ namespace {
         alignas(int) bn::regular_bg_map_cell cells[cells_count];
         bn::regular_bg_map_item map_item;
 
-        bg_map():
-            map_item(cells[0], bn::size(bg_map::columns, bg_map::rows)) {
-            reset();
-        }
+        bg_map();
 
-        void update() {
-            if (cells[0] == 0) {
-                bn::memory::copy(patron1[0], cells_count, cells[0]);
-            }
-            else {
-                bn::memory::copy(patron2[0], cells_count, cells[0]);
-            }
-        }
+        void update();
 
-        void reset() {
-            bn::memory::copy(patron1[0], cells_count, cells[0]);
-        }
+        void reset();
     };
 }
 #endif
