@@ -114,28 +114,28 @@ print()'''
         print(valor,end="")"""
 print()
 
-#with open("graphics/tiles2_palette.bmp","b+r") as img:
+# with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
 with Image.open("graphics/tiles2_palette.bmp") as img:
     arr = np.asarray(img)
-    #print(arr)
-    #print(img.getpalette()[:16*3])
+    # print(arr)
+    # print(img.getpalette()[:16*3])
 
     primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
     primeraParte = primeraParte.split()
 
     for i, valor in enumerate(primeraParte):
         primeraParte[i] = "0x"+valor
-        primeraParte[i] = int(primeraParte[i],16)
-    print(int("0x100",16))
+        primeraParte[i] = int(primeraParte[i], 16)
+    print(int("0x100", 16))
 
     tamano = []
 
     alto = hex(img.height)
-    alto = hex(255)
+    #alto = hex(255)
     alto = alto[2:]
-    
+
     if len(alto) < 6:
         alto = f"{'0'*(6-len(alto))}{alto}"
 
@@ -163,23 +163,25 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
 
     for i, valor in enumerate(tamano):
         tamano[i] = "0x"+valor
-        tamano[i] = int(tamano[i],16)
-
+        tamano[i] = int(tamano[i], 16)
 
     segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
     segundaParte = segundaParte.split()
 
     for i, valor in enumerate(segundaParte):
         segundaParte[i] = "0x"+valor
-        segundaParte[i] = int(segundaParte[i],16)
-    
-    print(segundaParte)
+        segundaParte[i] = int(segundaParte[i], 16)
 
-    num = [int("0xff",16)]
-    with open("archivo.bmp","wb") as f:
+    paleta = img.getpalette()
+    paleta = paleta[:16*6]
+
+
+    num = [int("0xff", 16)]
+    with open("archivo.bmp", "wb") as f:
         f.write(bytearray(primeraParte))
         f.write(bytearray(tamano))
         f.write(bytearray(segundaParte))
+        f.write(bytearray(paleta))
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
