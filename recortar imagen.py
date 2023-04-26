@@ -117,7 +117,7 @@ print()
 # with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
-with Image.open("graphics/tiles2_palette.bmp") as img:
+with Image.open("imagen4bit3.bmp") as img:
     arr = np.asarray(img)
     # print(arr)
     # print(img.getpalette()[:16*3])
@@ -173,7 +173,21 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
         segundaParte[i] = int(segundaParte[i], 16)
 
     paleta = img.getpalette()
+    print(paleta)
     paleta = paleta[:16*3]
+    
+    #print(paleta)
+    aux1 = []
+    aux2 = []
+    for i, valor in enumerate(paleta.copy()):
+        aux1.append(valor)
+        if((i+1)%3 == 0):
+            aux1.reverse()
+            aux2.extend(aux1)
+            aux1.clear()
+    paleta = aux2
+    print()
+    print(paleta)
 
     aux = []
     print(len(paleta))
@@ -182,7 +196,7 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
         if ((i+1)%3 == 0 ) and i != 0:
             aux.append(0)
     paleta = aux.copy()
-    print(paleta)
+    #print(paleta)
 
     #a = "FF FF  00 00 00 00  00 00 31 39 66 00 30 6F  8A 00 3B 56  8F 00 11 11  11 00 33 33 33 00 55 55  55 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 FF FF  FF 00"
     #a = a.split()
@@ -190,11 +204,15 @@ with Image.open("graphics/tiles2_palette.bmp") as img:
     #print(len(a))
     #print(len(paleta))
     num = [int("0xff", 16)]
+
+    imgArr = np.asarray(img).flatten()
+    print(np.asarray(img).flatten())
     with open("archivo.bmp", "wb") as f:
         f.write(bytearray(primeraParte))
         f.write(bytearray(tamano))
         f.write(bytearray(segundaParte))
         f.write(bytearray(paleta))
+        #f.write(bytearray(imgArr))
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
