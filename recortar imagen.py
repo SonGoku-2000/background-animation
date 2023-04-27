@@ -1,6 +1,6 @@
 from PIL import Image, ImageChops
 import numpy as np
-import time
+from convetidor4bit import convertidor4Bit
 
 
 def igual(img1, img2):
@@ -65,123 +65,6 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write('}\n')
 
 
-def convertidorCuatroBits(img, dest="archivo.bmp"):
-    img = img.convert(
-        "P", palette=Image.Palette.ADAPTIVE, colors=16)
-
-    # seccion de la primera parte
-    inicio = time.time()
-    primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
-    primeraParte = primeraParte.split()
-
-    for i, valor in enumerate(primeraParte):
-        primeraParte[i] = "0x"+valor
-        primeraParte[i] = int(primeraParte[i], 16)
-
-    fin = time.time()
-    print(f"Tiempo primera parte: {fin-inicio}")
-
-    # seccion del tamano
-
-    inicio = time.time()
-    tamano = []
-    alto = hex(img.height)
-    alto = alto[2:]
-
-    if len(alto) < 6:
-        alto = f"{'0'*(6-len(alto))}{alto}"
-
-    aux = ""
-    for i, letra in enumerate(alto):
-        aux += letra
-        if i != 0 and (i+1) % 2 == 0:
-            tamano.append(aux)
-            aux = ""
-    tamano.append("00")
-
-    ancho = hex(img.width)
-    ancho = ancho[2:]
-
-    if len(ancho) < 6:
-        ancho = f"{'0'*(6-len(ancho))}{ancho}"
-
-    aux = ""
-    for i, letra in enumerate(ancho):
-        aux += letra
-        if i != 0 and (i+1) % 2 == 0:
-            tamano.append(aux)
-            aux = ""
-    tamano.reverse()
-
-    for i, valor in enumerate(tamano):
-        tamano[i] = "0x"+valor
-        tamano[i] = int(tamano[i], 16)
-    fin = time.time()
-    print(f"Tiempo tamano: {fin-inicio}")
-
-    # seccion de segunda parte
-    inicio = time.time()
-    segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
-    segundaParte = segundaParte.split()
-
-    for i, valor in enumerate(segundaParte):
-        segundaParte[i] = "0x"+valor
-        segundaParte[i] = int(segundaParte[i], 16)
-
-    fin = time.time()
-    print(f"Tiempo segunda parte: {fin-inicio}")
-
-    # seccion paleta de color
-    inicio = time.time()
-    paleta = img.getpalette()
-    paleta = paleta[:16*3]
-
-    aux1 = []
-    aux2 = []
-    for i, valor in enumerate(paleta.copy()):
-        aux1.append(valor)
-        if((i+1) % 3 == 0):
-            aux1.reverse()
-            aux2.extend(aux1)
-            aux1.clear()
-    paleta = aux2
-
-    aux = []
-    for i, valor in enumerate(paleta.copy()):
-        aux.append(valor)
-        if ((i+1) % 3 == 0) and i != 0:
-            aux.append(0)
-    paleta = aux.copy()
-    fin = time.time()
-    print(f"Tiempo paleta: {fin-inicio}")
-
-    # seccion imagen
-    inicio = time.time()
-    imgArr = np.asarray(img)
-    imgArr = imgArr.copy()
-    imgArr = np.flip(imgArr)
-
-    for i in range(len(imgArr)):
-        imgArr[i] = np.flip(imgArr[i])
-    imgArr = imgArr.flatten()
-
-    aux1 = "0x"
-    aux2 = []
-    for i, valor in enumerate(imgArr):
-        aux1 += str(hex(valor)[2:])
-        if (i+1) % 2 == 0:
-            aux2.append(int(aux1, 16))
-            aux1 = "0x"
-    imgArr = aux2.copy()
-    fin = time.time()
-    print(f"Tiempo imagen parte: {fin-inicio}")
-
-    with open(dest, "wb") as f:
-        f.write(bytearray(primeraParte))
-        f.write(bytearray(tamano))
-        f.write(bytearray(segundaParte))
-        f.write(bytearray(paleta))
-        f.write(bytearray(imgArr))
 
 
 tiles = []
@@ -216,11 +99,9 @@ primerpixel
 
 print()
 
-# with open("graphics/tiles2_palette.bmp","b+r") as img:
-#    print(img.readlines())
 
-with Image.open("graphics/cliffs.bmp") as img:
-    convertidorCuatroBits(img)
+with Image.open("graphics/tiles2.bmp") as img:
+    convertidor4Bit(img)
 
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
