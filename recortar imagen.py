@@ -64,7 +64,100 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write(f'    "colors_count": {colores}\n')
         archivoJson.write('}\n')
 
+def convertidorCuatroBits(img,dest="archivo.bmp"):
+    img = img.convert(
+        "P", palette=Image.Palette.ADAPTIVE, colors=16)
 
+    primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
+    primeraParte = primeraParte.split()
+
+    for i, valor in enumerate(primeraParte):
+        primeraParte[i] = "0x"+valor
+        primeraParte[i] = int(primeraParte[i], 16)
+
+    tamano = []
+
+    alto = hex(img.height)
+    #alto = hex(255)
+    alto = alto[2:]
+
+    if len(alto) < 6:
+        alto = f"{'0'*(6-len(alto))}{alto}"
+
+    aux = ""
+    for i, letra in enumerate(alto):
+        aux += letra
+        if i != 0 and (i+1) % 2 == 0:
+            tamano.append(aux)
+            aux = ""
+    tamano.append("00")
+
+    ancho = hex(img.width)
+    ancho = ancho[2:]
+
+    if len(ancho) < 6:
+        ancho = f"{'0'*(6-len(ancho))}{ancho}"
+
+    aux = ""
+    for i, letra in enumerate(ancho):
+        aux += letra
+        if i != 0 and (i+1) % 2 == 0:
+            tamano.append(aux)
+            aux = ""
+    tamano.reverse()
+
+    for i, valor in enumerate(tamano):
+        tamano[i] = "0x"+valor
+        tamano[i] = int(tamano[i], 16)
+
+    segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
+    segundaParte = segundaParte.split()
+
+    for i, valor in enumerate(segundaParte):
+        segundaParte[i] = "0x"+valor
+        segundaParte[i] = int(segundaParte[i], 16)
+
+    paleta = img.getpalette()
+    paleta = paleta[:16*3]
+    
+    aux1 = []
+    aux2 = []
+    for i, valor in enumerate(paleta.copy()):
+        aux1.append(valor)
+        if((i+1)%3 == 0):
+            aux1.reverse()
+            aux2.extend(aux1)
+            aux1.clear()
+    paleta = aux2
+
+    aux = []
+    for i, valor in enumerate(paleta.copy()):
+        aux.append(valor)
+        if ((i+1)%3 == 0 ) and i != 0:
+            aux.append(0)
+    paleta = aux.copy()
+
+    imgArr = np.asarray(img)
+    imgArr = imgArr.copy()
+    imgArr = np.flip(imgArr)
+    for i, fila in enumerate(imgArr):
+        imgArr[i] = np.flip(imgArr[i])
+    imgArr = imgArr.flatten()
+    
+    aux1 = "0x"
+    aux2 = []
+    for i, valor in enumerate(imgArr):
+        aux1 += str(hex(valor)[2:])
+        if (i+1) % 2 == 0:
+            aux2.append(int(aux1,16))
+            aux1 = "0x"
+    imgArr = aux2.copy()
+    with open(dest, "wb") as f:
+        f.write(bytearray(primeraParte))
+        f.write(bytearray(tamano))
+        f.write(bytearray(segundaParte))
+        f.write(bytearray(paleta))
+        f.write(bytearray(imgArr))
 tiles = []
 mapa = []
 
@@ -117,129 +210,9 @@ print()
 # with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
-with Image.open("cliffs.bmp") as img:
-    img = img.convert(
-        "P", palette=Image.Palette.ADAPTIVE, colors=16)
-    arr = np.asarray(img)
-    #print(arr)
-    #for i in arr.flatten():
-    #    if i > 256:
-    #        print(i)
-    # print(arr)
-    # print(img.getpalette()[:16*3])
-
-    primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
-    primeraParte = primeraParte.split()
-
-    for i, valor in enumerate(primeraParte):
-        primeraParte[i] = "0x"+valor
-        primeraParte[i] = int(primeraParte[i], 16)
-    #print(int("0x100", 16))
-
-    tamano = []
-
-    alto = hex(img.height)
-    #alto = hex(255)
-    alto = alto[2:]
-
-    if len(alto) < 6:
-        alto = f"{'0'*(6-len(alto))}{alto}"
-
-    aux = ""
-    for i, letra in enumerate(alto):
-        aux += letra
-        if i != 0 and (i+1) % 2 == 0:
-            tamano.append(aux)
-            aux = ""
-    tamano.append("00")
-
-    ancho = hex(img.width)
-    ancho = ancho[2:]
-
-    if len(ancho) < 6:
-        ancho = f"{'0'*(6-len(ancho))}{ancho}"
-
-    aux = ""
-    for i, letra in enumerate(ancho):
-        aux += letra
-        if i != 0 and (i+1) % 2 == 0:
-            tamano.append(aux)
-            aux = ""
-    tamano.reverse()
-
-    for i, valor in enumerate(tamano):
-        tamano[i] = "0x"+valor
-        tamano[i] = int(tamano[i], 16)
-
-    segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
-    segundaParte = segundaParte.split()
-
-    for i, valor in enumerate(segundaParte):
-        segundaParte[i] = "0x"+valor
-        segundaParte[i] = int(segundaParte[i], 16)
-
-    paleta = img.getpalette()
-    #print(paleta)
-    paleta = paleta[:16*3]
+with Image.open("imagen.bmp") as img:
+    convertidorCuatroBits(img)
     
-    #print(paleta)
-    aux1 = []
-    aux2 = []
-    for i, valor in enumerate(paleta.copy()):
-        aux1.append(valor)
-        if((i+1)%3 == 0):
-            aux1.reverse()
-            aux2.extend(aux1)
-            aux1.clear()
-    paleta = aux2
-    print()
-    #print(paleta)
-
-    aux = []
-    #print(len(paleta))
-    for i, valor in enumerate(paleta.copy()):
-        aux.append(valor)
-        if ((i+1)%3 == 0 ) and i != 0:
-            aux.append(0)
-    paleta = aux.copy()
-    #print(paleta)
-
-    #a = "FF FF  00 00 00 00  00 00 31 39 66 00 30 6F  8A 00 3B 56  8F 00 11 11  11 00 33 33 33 00 55 55  55 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 FF FF  FF 00"
-    #a = a.split()
-    #print(a)
-    #print(len(a))
-    #print(len(paleta))
-    num = [int("0xff", 16)]
-
-    imgArr = np.asarray(img)
-    imgArr = imgArr.copy()
-    imgArr = np.flip(imgArr)
-    for i, fila in enumerate(imgArr):
-        imgArr[i] = np.flip(imgArr[i])
-    imgArr = imgArr.flatten()
-    #print(imgArr)
-    
-    aux1 = "0x"
-    aux2 = []
-    for i, valor in enumerate(imgArr):
-        aux1 += str(valor)
-        if (i+1) % 2 == 0:
-            #print(aux1)
-            aux2.append(int(aux1,16))
-            aux1 = "0x"
-    #print(aux2)
-    imgArr = aux2.copy()
-    #imgArr.reverse()
-    #print(imgArr)
-    #for i in imgArr():
-    #    if i > 256:
-    #        print(i)
-    with open("archivo.bmp", "wb") as f:
-        f.write(bytearray(primeraParte))
-        f.write(bytearray(tamano))
-        f.write(bytearray(segundaParte))
-        f.write(bytearray(paleta))
-        f.write(bytearray(imgArr))
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
