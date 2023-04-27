@@ -68,6 +68,8 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
     img = img.convert(
         "P", palette=Image.Palette.ADAPTIVE, colors=16)
 
+    # seccion de la primera parte
+    inicio = time.time()
     primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
     primeraParte = primeraParte.split()
 
@@ -75,10 +77,16 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
         primeraParte[i] = "0x"+valor
         primeraParte[i] = int(primeraParte[i], 16)
 
-    tamano = []
+    fin = time.time()
+    print(f"Tiempo primera parte: {fin-inicio}")
 
+
+
+    #seccion del tamano
+
+    inicio = time.time()
+    tamano = []
     alto = hex(img.height)
-    #alto = hex(255)
     alto = alto[2:]
 
     if len(alto) < 6:
@@ -109,7 +117,12 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
     for i, valor in enumerate(tamano):
         tamano[i] = "0x"+valor
         tamano[i] = int(tamano[i], 16)
+    fin = time.time()
+    print(f"Tiempo tamano: {fin-inicio}")
 
+
+    #seccion de segunda parte
+    inicio = time.time()
     segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
     segundaParte = segundaParte.split()
 
@@ -117,6 +130,12 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
         segundaParte[i] = "0x"+valor
         segundaParte[i] = int(segundaParte[i], 16)
 
+    fin = time.time()
+    print(f"Tiempo segunda parte: {fin-inicio}")
+
+
+    #seccion paleta de color
+    inicio = time.time()
     paleta = img.getpalette()
     paleta = paleta[:16*3]
     
@@ -136,7 +155,12 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
         if ((i+1)%3 == 0 ) and i != 0:
             aux.append(0)
     paleta = aux.copy()
+    fin = time.time()
+    print(f"Tiempo paleta: {fin-inicio}")
+    
 
+    #seccion imagen
+    inicio = time.time()
     imgArr = np.asarray(img)
     imgArr = imgArr.copy()
     imgArr = np.flip(imgArr)
@@ -152,6 +176,9 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
             aux2.append(int(aux1,16))
             aux1 = "0x"
     imgArr = aux2.copy()
+    fin = time.time()
+    print(f"Tiempo imagen parte: {fin-inicio}")
+    
     with open(dest, "wb") as f:
         f.write(bytearray(primeraParte))
         f.write(bytearray(tamano))
@@ -188,29 +215,12 @@ primerpixel
 
 """
 
-'''with open("imagen4bit.bmp","rb") as img:
-    datos1 =  str(img.readline())
-    datos1 = datos1.split("\\")
-    for i,valor in enumerate(datos1):
-        if (i%8 ==0):
-            print()
-        print(valor,end=" ")
-
-print()'''
-
-"""with open("tiles2.bmp","b+r") as img:
-    datos2 =  str(img.readline())
-
-    for i,valor in enumerate(datos2[4:]):
-        if (i%16 ==0):
-            print()
-        print(valor,end="")"""
 print()
 
 # with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
-with Image.open("imagen.bmp") as img:
+with Image.open("graphics/tiles2.bmp") as img:
     convertidorCuatroBits(img)
     
     """b = img.crop((0, 0, 8, 8))
