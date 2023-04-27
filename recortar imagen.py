@@ -64,7 +64,8 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write(f'    "colors_count": {colores}\n')
         archivoJson.write('}\n')
 
-def convertidorCuatroBits(img,dest="archivo.bmp"):
+
+def convertidorCuatroBits(img, dest="archivo.bmp"):
     img = img.convert(
         "P", palette=Image.Palette.ADAPTIVE, colors=16)
 
@@ -80,9 +81,7 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
     fin = time.time()
     print(f"Tiempo primera parte: {fin-inicio}")
 
-
-
-    #seccion del tamano
+    # seccion del tamano
 
     inicio = time.time()
     tamano = []
@@ -120,8 +119,7 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
     fin = time.time()
     print(f"Tiempo tamano: {fin-inicio}")
 
-
-    #seccion de segunda parte
+    # seccion de segunda parte
     inicio = time.time()
     segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
     segundaParte = segundaParte.split()
@@ -133,17 +131,16 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
     fin = time.time()
     print(f"Tiempo segunda parte: {fin-inicio}")
 
-
-    #seccion paleta de color
+    # seccion paleta de color
     inicio = time.time()
     paleta = img.getpalette()
     paleta = paleta[:16*3]
-    
+
     aux1 = []
     aux2 = []
     for i, valor in enumerate(paleta.copy()):
         aux1.append(valor)
-        if((i+1)%3 == 0):
+        if((i+1) % 3 == 0):
             aux1.reverse()
             aux2.extend(aux1)
             aux1.clear()
@@ -152,39 +149,41 @@ def convertidorCuatroBits(img,dest="archivo.bmp"):
     aux = []
     for i, valor in enumerate(paleta.copy()):
         aux.append(valor)
-        if ((i+1)%3 == 0 ) and i != 0:
+        if ((i+1) % 3 == 0) and i != 0:
             aux.append(0)
     paleta = aux.copy()
     fin = time.time()
     print(f"Tiempo paleta: {fin-inicio}")
-    
 
-    #seccion imagen
+    # seccion imagen
     inicio = time.time()
     imgArr = np.asarray(img)
     imgArr = imgArr.copy()
     imgArr = np.flip(imgArr)
-    for i, fila in enumerate(imgArr):
+
+    for i in range(len(imgArr)):
         imgArr[i] = np.flip(imgArr[i])
     imgArr = imgArr.flatten()
-    
+
     aux1 = "0x"
     aux2 = []
     for i, valor in enumerate(imgArr):
         aux1 += str(hex(valor)[2:])
         if (i+1) % 2 == 0:
-            aux2.append(int(aux1,16))
+            aux2.append(int(aux1, 16))
             aux1 = "0x"
     imgArr = aux2.copy()
     fin = time.time()
     print(f"Tiempo imagen parte: {fin-inicio}")
-    
+
     with open(dest, "wb") as f:
         f.write(bytearray(primeraParte))
         f.write(bytearray(tamano))
         f.write(bytearray(segundaParte))
         f.write(bytearray(paleta))
         f.write(bytearray(imgArr))
+
+
 tiles = []
 mapa = []
 
@@ -220,9 +219,9 @@ print()
 # with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
-with Image.open("graphics/tiles2.bmp") as img:
+with Image.open("graphics/cliffs.bmp") as img:
     convertidorCuatroBits(img)
-    
+
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
