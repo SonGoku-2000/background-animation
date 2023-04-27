@@ -117,8 +117,14 @@ print()
 # with open("graphics/tiles2_palette.bmp","b+r") as img:
 #    print(img.readlines())
 
-with Image.open("imagen4bit3.bmp") as img:
+with Image.open("cliffs.bmp") as img:
+    img = img.convert(
+        "P", palette=Image.Palette.ADAPTIVE, colors=16)
     arr = np.asarray(img)
+    #print(arr)
+    #for i in arr.flatten():
+    #    if i > 256:
+    #        print(i)
     # print(arr)
     # print(img.getpalette()[:16*3])
 
@@ -128,7 +134,7 @@ with Image.open("imagen4bit3.bmp") as img:
     for i, valor in enumerate(primeraParte):
         primeraParte[i] = "0x"+valor
         primeraParte[i] = int(primeraParte[i], 16)
-    print(int("0x100", 16))
+    #print(int("0x100", 16))
 
     tamano = []
 
@@ -173,7 +179,7 @@ with Image.open("imagen4bit3.bmp") as img:
         segundaParte[i] = int(segundaParte[i], 16)
 
     paleta = img.getpalette()
-    print(paleta)
+    #print(paleta)
     paleta = paleta[:16*3]
     
     #print(paleta)
@@ -187,10 +193,10 @@ with Image.open("imagen4bit3.bmp") as img:
             aux1.clear()
     paleta = aux2
     print()
-    print(paleta)
+    #print(paleta)
 
     aux = []
-    print(len(paleta))
+    #print(len(paleta))
     for i, valor in enumerate(paleta.copy()):
         aux.append(valor)
         if ((i+1)%3 == 0 ) and i != 0:
@@ -205,14 +211,35 @@ with Image.open("imagen4bit3.bmp") as img:
     #print(len(paleta))
     num = [int("0xff", 16)]
 
-    imgArr = np.asarray(img).flatten()
-    print(np.asarray(img).flatten())
+    imgArr = np.asarray(img)
+    imgArr = imgArr.copy()
+    imgArr = np.flip(imgArr)
+    for i, fila in enumerate(imgArr):
+        imgArr[i] = np.flip(imgArr[i])
+    imgArr = imgArr.flatten()
+    #print(imgArr)
+    
+    aux1 = "0x"
+    aux2 = []
+    for i, valor in enumerate(imgArr):
+        aux1 += str(valor)
+        if (i+1) % 2 == 0:
+            #print(aux1)
+            aux2.append(int(aux1,16))
+            aux1 = "0x"
+    #print(aux2)
+    imgArr = aux2.copy()
+    #imgArr.reverse()
+    #print(imgArr)
+    #for i in imgArr():
+    #    if i > 256:
+    #        print(i)
     with open("archivo.bmp", "wb") as f:
         f.write(bytearray(primeraParte))
         f.write(bytearray(tamano))
         f.write(bytearray(segundaParte))
         f.write(bytearray(paleta))
-        #f.write(bytearray(imgArr))
+        f.write(bytearray(imgArr))
     """b = img.crop((0, 0, 8, 8))
     c = img.crop((8, 0, 16, 8))
 
