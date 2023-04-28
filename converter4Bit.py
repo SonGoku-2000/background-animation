@@ -14,7 +14,7 @@ def stringToHex(string: str):
     return string
 
 
-def funcPrimeraParte(debug):
+def funcFirstPart(debug):
     inicio = time.time()
     primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
     primeraParte = stringToHex(primeraParte)
@@ -24,7 +24,7 @@ def funcPrimeraParte(debug):
     return primeraParte
 
 
-def funcTamano(img: Image, debug):
+def funcSize(img: Image, debug):
     inicio = time.time()
     tamano = []
     alto = hex(img.height)
@@ -64,7 +64,7 @@ def funcTamano(img: Image, debug):
     return tamano
 
 
-def funcSegundaParte(debug):
+def funcSecondPart(debug):
     inicio = time.time()
 
     segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
@@ -76,7 +76,7 @@ def funcSegundaParte(debug):
     return segundaParte
 
 
-def funcPaleta(img: Image, debug):
+def funcPalette(img: Image, debug):
     inicio = time.time()
     paleta = img.getpalette()
     paleta = paleta[:16*3]
@@ -103,7 +103,7 @@ def funcPaleta(img: Image, debug):
     return paleta
 
 
-def funcImagen(img: Image, debug):
+def funcImage(img: Image, debug):
     inicio = time.time()
     imgArr = np.asarray(img)
     imgArr = imgArr.copy()
@@ -127,20 +127,20 @@ def funcImagen(img: Image, debug):
     return imgArr
 
 
-def convertidor4Bit(img: Image, dest="archivo.bmp", debug=False):
+def converter4Bit(img: Image, dest="archivo.bmp", debug=False):
     img = img.convert("P",
                       palette=Image.Palette.ADAPTIVE,
                       colors=16)
 
-    primeraParte = funcPrimeraParte(debug)
+    primeraParte = funcFirstPart(debug)
 
-    tamano = funcTamano(img, debug)
+    tamano = funcSize(img, debug)
 
-    segundaParte = funcSegundaParte(debug)
+    segundaParte = funcSecondPart(debug)
 
-    paleta = funcPaleta(img, debug)
+    paleta = funcPalette(img, debug)
 
-    imgArr = funcImagen(img, debug)
+    imgArr = funcImage(img, debug)
 
     with open(dest, "wb") as f:
         f.write(bytearray(primeraParte))
@@ -168,7 +168,7 @@ def process(args):
             print("Processing:", imgPath, end="\n\n")
 
         with Image.open(imgPath) as img:
-            convertidor4Bit(img, outputPath.joinpath(Path(imgPath).name),
+            converter4Bit(img, outputPath.joinpath(Path(imgPath).name),
                             args.progress)
 
     for imgForderPath in imgFoldersPaths:
@@ -178,19 +178,20 @@ def process(args):
 
             outputPath.joinpath(imgForderPath).mkdir(exist_ok=True)
             with Image.open(imgPath) as img:
-                convertidor4Bit(img, outputPath.joinpath(imgPath),
+                converter4Bit(img, outputPath.joinpath(imgPath),
                                 args.progress)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.')
+    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.',
+                                     epilog="This is not too eficient and could be improbed, but works.")
     parser.add_argument('--dirs', required=True, type=str,
-                        nargs='+', help='Relative paths for images or folders with images to convert')
-    parser.add_argument('--output', required=True, help='Output folder for the images')
+                        nargs='+', help='Relative paths for images or folders with images to convert, separed with a space ex: --dirs img1.bmp path1/')
+    parser.add_argument('--output', required=True, help='Output folder for the images.')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-p', '--progress', action='store_true')
-
-    args = parser.parse_args(['--dirs', 'graphics/tiles2_palette.bmp', 'graphics/tiles2_palette.bm',
-                              'graphic', 'graphics', 'graphics/g', 'graphics/tiles2.bmp',
-                              "--output", "dirImagen", "--verbose", "-p"])
+    #args = parser.parse_args(['--dirs', 'graphics/tiles2 palette.bmp', 'graphics/tiles2_palette.bm',
+    #                          'graphic', 'graphics', 'graphics/g/', 'graphics/tiles2.bmp',
+    #                          "--output", "dirImagen", "--verbose", "-p"])
+    args = parser.parse_args()
     process(args)
