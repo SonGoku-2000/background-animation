@@ -14,16 +14,17 @@ def stringToHex(string: str):
     return string
 
 
-def funcPrimeraParte():
+def funcPrimeraParte(debug):
     inicio = time.time()
     primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
     primeraParte = stringToHex(primeraParte)
     fin = time.time()
-    print(f"Tiempo primera parte: {fin-inicio}", end="\n\n")
+    if debug:
+        print(f"Time first part: {fin-inicio}", end="\n\n")
     return primeraParte
 
 
-def funcTamano(img: Image):
+def funcTamano(img: Image, debug):
     inicio = time.time()
     tamano = []
     alto = hex(img.height)
@@ -58,22 +59,24 @@ def funcTamano(img: Image):
         tamano[i] = "0x"+valor
         tamano[i] = int(tamano[i], 16)
     fin = time.time()
-    print(f"Tiempo tamano: {fin-inicio}", end="\n\n")
+    if debug:
+        print(f"Time size: {fin-inicio}", end="\n\n")
     return tamano
 
 
-def funcSegundaParte():
+def funcSegundaParte(debug):
     inicio = time.time()
 
     segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
     segundaParte = stringToHex(segundaParte)
 
     fin = time.time()
-    print(f"Tiempo segunda parte: {fin-inicio}", end="\n\n")
+    if debug:
+        print(f"Time second part: {fin-inicio}", end="\n\n")
     return segundaParte
 
 
-def funcPaleta(img: Image):
+def funcPaleta(img: Image, debug):
     inicio = time.time()
     paleta = img.getpalette()
     paleta = paleta[:16*3]
@@ -95,11 +98,12 @@ def funcPaleta(img: Image):
             aux.append(0)
     paleta = aux.copy()
     fin = time.time()
-    print(f"Tiempo paleta: {fin-inicio}", end="\n\n")
+    if debug:
+        print(f"Time palette: {fin-inicio}", end="\n\n")
     return paleta
 
 
-def funcImagen(img: Image):
+def funcImagen(img: Image, debug):
     inicio = time.time()
     imgArr = np.asarray(img)
     imgArr = imgArr.copy()
@@ -118,24 +122,25 @@ def funcImagen(img: Image):
             aux1 = "0x"
     imgArr = aux2.copy()
     fin = time.time()
-    print(f"Tiempo imagen parte: {fin-inicio}", end="\n\n")
+    if debug:
+        print(f"Time image part: {fin-inicio}", end="\n\n")
     return imgArr
 
 
-def convertidor4Bit(img: Image, dest="archivo.bmp"):
+def convertidor4Bit(img: Image, dest="archivo.bmp", debug=False):
     img = img.convert("P",
                       palette=Image.Palette.ADAPTIVE,
                       colors=16)
 
-    primeraParte = funcPrimeraParte()
+    primeraParte = funcPrimeraParte(debug)
 
-    tamano = funcTamano(img)
+    tamano = funcTamano(img, debug)
 
-    segundaParte = funcSegundaParte()
+    segundaParte = funcSegundaParte(debug)
 
-    paleta = funcPaleta(img)
+    paleta = funcPaleta(img, debug)
 
-    imgArr = funcImagen(img)
+    imgArr = funcImagen(img, debug)
 
     with open(dest, "wb") as f:
         f.write(bytearray(primeraParte))
@@ -159,23 +164,33 @@ def process(args):
             continue
 
     for imgPath in imgPaths:
+        if args.verbose:
+            print("Processing:", imgPath, end="\n\n")
+
         with Image.open(imgPath) as img:
-            convertidor4Bit(img, outputPath.joinpath(Path(imgPath).name))
+            convertidor4Bit(img, outputPath.joinpath(Path(imgPath).name),
+                            args.progress)
 
     for imgForderPath in imgFoldersPaths:
         for imgPath in Path(imgForderPath).glob("*.bmp"):
+            if args.verbose:
+                print("Processing:", imgPath, end="\n\n")
+
             outputPath.joinpath(imgForderPath).mkdir(exist_ok=True)
             with Image.open(imgPath) as img:
-                convertidor4Bit(img, outputPath.joinpath(imgPath))
+                convertidor4Bit(img, outputPath.joinpath(imgPath),
+                                args.progress)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='External tool example.')
+    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.')
     parser.add_argument('--dirs', required=True, type=str,
-                        nargs='+', help='build folder path')
-    parser.add_argument('--output', required=True, help='build folder path')
+                        nargs='+', help='Relative paths for images or folders with images to convert')
+    parser.add_argument('--output', required=True, help='Output folder for the images')
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-p', '--progress', action='store_true')
 
     args = parser.parse_args(['--dirs', 'graphics/tiles2_palette.bmp', 'graphics/tiles2_palette.bm',
                               'graphic', 'graphics', 'graphics/g', 'graphics/tiles2.bmp',
-                              "--output", "dirImagen"])
+                              "--output", "dirImagen", "--verbose", "-p"])
     process(args)
