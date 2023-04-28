@@ -1,3 +1,6 @@
+import argparse
+from pathlib import Path
+
 from PIL import Image
 import numpy as np
 import time
@@ -140,3 +143,31 @@ def convertidor4Bit(img: Image, dest="archivo.bmp"):
         f.write(bytearray(segundaParte))
         f.write(bytearray(paleta))
         f.write(bytearray(imgArr))
+
+
+def process(args):
+    outputPath = Path(args.output)
+    outputPath.mkdir(exist_ok=True)
+    imgPaths = []
+    imgFoldersPaths = []
+    for path in args.dirs:
+        if(Path(path).is_file()):
+            imgPaths.append(path)
+            continue
+        if(Path(path).is_dir()):
+            imgFoldersPaths.append(path)
+            continue
+    
+    for imgPath in imgPaths:
+        with Image.open(imgPath) as img:
+            convertidor4Bit(img,outputPath.joinpath(Path(imgPath).name))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='External tool example.')
+    parser.add_argument('--dirs', required=True, type=str,
+                        nargs='+', help='build folder path')
+    parser.add_argument('--output', required=True, help='build folder path')
+
+    args = parser.parse_args(['--dirs', 'graphics/tiles2_palette.bmp','graphics/tiles2_palette.bm','graphic','graphics', 'graphics/tiles2.bmp', "--output", "dirImagen"])
+    process(args)
