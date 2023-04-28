@@ -157,10 +157,16 @@ def process(args):
         if(Path(path).is_dir()):
             imgFoldersPaths.append(path)
             continue
-    
+
     for imgPath in imgPaths:
         with Image.open(imgPath) as img:
-            convertidor4Bit(img,outputPath.joinpath(Path(imgPath).name))
+            convertidor4Bit(img, outputPath.joinpath(Path(imgPath).name))
+
+    for imgForderPath in imgFoldersPaths:
+        for imgPath in Path(imgForderPath).glob("*.bmp"):
+            outputPath.joinpath(imgForderPath).mkdir(exist_ok=True)
+            with Image.open(imgPath) as img:
+                convertidor4Bit(img, outputPath.joinpath(imgPath))
 
 
 if __name__ == "__main__":
@@ -169,5 +175,7 @@ if __name__ == "__main__":
                         nargs='+', help='build folder path')
     parser.add_argument('--output', required=True, help='build folder path')
 
-    args = parser.parse_args(['--dirs', 'graphics/tiles2_palette.bmp','graphics/tiles2_palette.bm','graphic','graphics', 'graphics/tiles2.bmp', "--output", "dirImagen"])
+    args = parser.parse_args(['--dirs', 'graphics/tiles2_palette.bmp', 'graphics/tiles2_palette.bm',
+                              'graphic', 'graphics', 'graphics/g', 'graphics/tiles2.bmp',
+                              "--output", "dirImagen"])
     process(args)
