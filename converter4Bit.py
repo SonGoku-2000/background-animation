@@ -103,15 +103,30 @@ def funcPalette(img: Image, debug):
     return paleta
 
 
-def funcImage(img: Image, debug):
+def funcImage(img: Image.Image, debug):
     inicio = time.time()
     imgArr = np.asarray(img)
-    imgArr = imgArr.copy()
     imgArr = np.flip(imgArr)
 
+    if img.width <= 16:
+        nCeros = 1
+
+        while img.width > nCeros:
+            nCeros *= 2
+    else:
+        cont = 2
+        nCeros = 16
+        while img.width > nCeros:
+            cont += 1
+            nCeros = 8 * cont
+
+    nCeros = nCeros - img.width
+    aux = []
     for i in range(len(imgArr)):
-        imgArr[i] = np.flip(imgArr[i])
-    imgArr = imgArr.flatten()
+        aux.extend(np.flip(imgArr[i]).tolist())
+        aux.extend([0 for i in range(nCeros)])
+
+    imgArr = aux
 
     aux1 = "0x"
     aux2 = []
@@ -128,6 +143,17 @@ def funcImage(img: Image, debug):
 
 
 def converter4Bit(img: Image, dest="archivo.bmp", debug=False):
+    """
+    Parameters
+    ----------
+    img : Image
+        The image that be to convert to 4bpp image
+    dest : str, default "archivo.bmp"
+        The name of the  output image
+    debug : bool, default False
+        Print the steps and the progres of the conversion
+    """
+
     img = img.convert("P",
                       palette=Image.Palette.ADAPTIVE,
                       colors=16)
@@ -139,7 +165,6 @@ def converter4Bit(img: Image, dest="archivo.bmp", debug=False):
     segundaParte = funcSecondPart(debug)
 
     paleta = funcPalette(img, debug)
-
     imgArr = funcImage(img, debug)
 
     with open(dest, "wb") as f:
@@ -150,7 +175,18 @@ def converter4Bit(img: Image, dest="archivo.bmp", debug=False):
         f.write(bytearray(imgArr))
 
 
-def process(args):
+def process(args: argparse.Namespace):
+    """
+    Parameters
+    ----------
+    args : argsparse
+           argsparse that contains the folowing args:\n
+           dirs: [str, str, ...], 
+           output: str, 
+           verbose:bool, 
+           progress:bool
+    """
+
     outputPath = Path(args.output)
     outputPath.mkdir(exist_ok=True)
     imgPaths = []
@@ -168,30 +204,31 @@ def process(args):
             print("Processing:", imgPath, end="\n\n")
 
         with Image.open(imgPath) as img:
-            converter4Bit(img, outputPath.joinpath(Path(imgPath).name),
-                            args.progress)
+            converter4Bit(img, outputPath.joinpath(Path(imgPath).stem + ".bmp"),
+                          args.progress)
 
     for imgForderPath in imgFoldersPaths:
-        for imgPath in Path(imgForderPath).glob("*.bmp"):
+        for imgPath in Path(imgForderPath).glob("*.*"):
+            if (imgPath.suffix.lower() not in [".bmp", ".png", ".jpg", ".jpeg"]):
+                continue
+
             if args.verbose:
                 print("Processing:", imgPath, end="\n\n")
 
             outputPath.joinpath(imgForderPath).mkdir(exist_ok=True)
             with Image.open(imgPath) as img:
-                converter4Bit(img, outputPath.joinpath(imgPath),
-                                args.progress)
+                converter4Bit(img, outputPath.joinpath(imgForderPath).joinpath(imgPath.stem + ".bmp"),
+                              args.progress)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.',
                                      epilog="This is not too eficient and could be improbed, but works.")
-    parser.add_argument('--dirs', required=True, type=str,
-                        nargs='+', help='Relative paths for images or folders with images to convert, separed with a space ex: --dirs img1.bmp path1/')
-    parser.add_argument('--output', required=True, help='Output folder for the images.')
+    parser.add_argument('--dirs', '-d', required=True, type=str, nargs='+',
+                        help='Relative paths for images or folders with images to convert, separed with a space ex: --dirs img1.bmp path1/')
+    parser.add_argument('--output', '-o', required=True,
+                        help='Output folder for the images.')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-p', '--progress', action='store_true')
-    #args = parser.parse_args(['--dirs', 'graphics/tiles2 palette.bmp', 'graphics/tiles2_palette.bm',
-    #                          'graphic', 'graphics', 'graphics/g/', 'graphics/tiles2.bmp',
-    #                          "--output", "dirImagen", "--verbose", "-p"])
-    args = parser.parse_args()
+    args = parser.parse_args(["-d", "img.png", "-o", "o"])
     process(args)
