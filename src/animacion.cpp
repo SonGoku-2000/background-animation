@@ -8,9 +8,9 @@ namespace anim {
 
     Animacion::Animacion(int wait_updates):
         map_item(cells[0], bn::size(columns, rows)),
-        bg_item(bn::regular_bg_tiles_items::tiles,
-            bn::bg_palette_items::palette,
-            map_item),
+        bg_item(bn::regular_bg_tiles_items::tiles2,
+                bn::bg_palette_items::tiles2_palette,
+                map_item),
         bg(bg_item.create_bg(0, 0)) ,
         bg_map(bg.map()){
 
