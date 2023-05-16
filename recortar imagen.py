@@ -1,12 +1,14 @@
 from PIL import Image, ImageChops
 import numpy as np
-from convetidor4bit import convertidor4Bit
+from converter4Bit import converter4Bit
+import argparse
+from pathlib import Path
 
 
 def igual(img1, img2):
     diferencia = ImageChops.subtract_modulo(img1, img2)
     arr = np.asarray(diferencia)
-    if(np.count_nonzero(arr) == 0):
+    if (np.count_nonzero(arr) == 0):
         return True
     else:
         return False
@@ -33,9 +35,9 @@ def crearTiles(img):
 
 
 def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
-    if(bpp == 4):
+    if (bpp == 4):
         colores = 16
-    if(bpp == 8):
+    if (bpp == 8):
         colores = 256
 
     tilemap = Image.new(mode="RGB", size=(len(tiles) * 8, 8))
@@ -65,60 +67,37 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write('}\n')
 
 
+def process(args: argparse.Namespace):
+    imgPaths = []
+    imgFolderPaths = []
+
+    for dir in args.dirs:
+        print(dir)
+
+        if Path(dir).is_file():
+            imgPaths.append(dir)
+        elif Path(dir).is_dir():
+            imgFolderPaths.append(dir)
+        else:
+            try:
+                raise ValueError('File or path not exist')
+            except ValueError:
+                print(f"'{dir}' is not a real file or path")
+                raise
 
 
 tiles = []
 mapa = []
 
 debug = False
-"""
-42 4D 96 00  00 00 00 00  00 00 76 00  00 00 28 00  
-00 00                                          
-      10 00  00 tamano imagen 1ro 2do 3ro 
-                00  espacio
-                    08 00 00 tamano imagen1ro 2do 3ro 
-                             00 01 00 04  00 00 00  ni idea
-00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00  ni idea
-00 00 00 00  00 00 ni idea
 
-1ro 2do 3ro 
-
-paleta
-
-                   FF FF  00 00 00 00  00 00 31 39  
-66 00 30 6F  8A 00 3B 56  8F 00 11 11  11 00 33 33  
-33 00 55 55  55 00 00 00  00 00 00 00  00 00 00 00  
-00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  
-00 00 FF FF  FF 00
-
-imagen 
-ultimopixel 
-primerpixel
-
-"""
-
-print()
-
-
-with Image.open("graphics/tiles2.bmp") as img:
-    convertidor4Bit(img)
-
-    """b = img.crop((0, 0, 8, 8))
-    c = img.crop((8, 0, 16, 8))
-
-    inicio = time.time()
-    crearTiles(img)
-    fin = time.time()
-    guardarTilemap()
-    print(fin-inicio)
-
-    cont = 0
-    print(len(tiles))
-
-    if debug:
-        for i, id in enumerate(mapa):
-            if i % 16 == 0:
-                print()
-            print(id, end=",")
-    print()
-    print(f"Tiles totales: {len(tiles)}")"""
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='External tool example.')
+    parser.add_argument('--build', "-b", required=False,
+                        help='build folder path')
+    parser.add_argument('--dirs', "-d", required=False,
+                        type=str, nargs='+', help='build folder path')
+    args = parser.parse_args(['-d', "t", "1", '2'])
+    process(args)
+    tiles.clear()
+    mapa.clear()
