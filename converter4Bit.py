@@ -14,10 +14,49 @@ def stringToHex(string: str):
     return string
 
 
-def funcFirstPart(debug):
+def funcFirstPart(dimensions: list, secondPart: list, palette: list, imgarr: list, debug: bool):
+    """
+    Parameters
+    ----------
+    dimensiones : list
+        The list of int values for the dimensions part.
+    secondPart : list
+        The list of int values for the second part.
+    palette : list
+        The list of int values for the palette part.
+    imgarr : list
+        The list of int values for the imgArr part.
+    debug : bool
+        If True print the time need for do the conversion
+    """
     inicio = time.time()
-    primeraParte = "42 4D  96 00 00 00 00 00 00 00 76 00 00 00 28 00 00 00"
-    primeraParte = stringToHex(primeraParte)
+    primeraParte = []
+
+    primeraParte.extend(stringToHex("42 4D"))
+
+    tamanoArchivo = hex(len(dimensions)+len(secondPart) +
+                        len(palette)+len(imgarr)+18)
+    tamanoArchivo = tamanoArchivo[2:]
+
+    if len(tamanoArchivo) < 8:
+        tamanoArchivo = f"{'0'*(8-len(tamanoArchivo))}{tamanoArchivo}"
+
+    tamanoArchivoHex = []
+    aux = ""
+    for i, letra in enumerate(tamanoArchivo):
+        aux += letra
+        if i != 0 and (i+1) % 2 == 0:
+            tamanoArchivoHex.append(aux)
+            aux = ""
+    tamanoArchivoHex.reverse()
+
+    for i, valor in enumerate(tamanoArchivoHex):
+        tamanoArchivoHex[i] = "0x"+valor
+        tamanoArchivoHex[i] = int(tamanoArchivoHex[i], 16)
+    primeraParte.extend(tamanoArchivoHex)
+
+    primeraParte.extend(stringToHex("00 00 00 00 76 00 00 00 28 00 00 00"))
+
     fin = time.time()
     if debug:
         print(f"Time first part: {fin-inicio}", end="\n\n")
@@ -108,19 +147,10 @@ def funcImage(img: Image.Image, debug):
     imgArr = np.asarray(img)
     imgArr = np.flip(imgArr)
 
-    if img.width <= 16:
-        nCeros = 1
+    rowSize = (((4 * img.width)+31)//32)*4
+    rowSize *= 2
+    nCeros = rowSize - img.width
 
-        while img.width > nCeros:
-            nCeros *= 2
-    else:
-        cont = 2
-        nCeros = 16
-        while img.width > nCeros:
-            cont += 1
-            nCeros = 8 * cont
-
-    nCeros = nCeros - img.width
     aux = []
     for i in range(len(imgArr)):
         aux.extend(np.flip(imgArr[i]).tolist())
@@ -163,8 +193,6 @@ def converter4Bit(img: Image, dest="archivo.bmp", quantize=False, debug=False):
                           palette=Image.Palette.ADAPTIVE,
                           colors=16)
 
-    primeraParte = funcFirstPart(debug)
-
     tamano = funcSize(img, debug)
 
     segundaParte = funcSecondPart(debug)
@@ -172,6 +200,8 @@ def converter4Bit(img: Image, dest="archivo.bmp", quantize=False, debug=False):
     paleta = funcPalette(img, debug)
 
     imgArr = funcImage(img, debug)
+
+    primeraParte = funcFirstPart(tamano, segundaParte, paleta, imgArr, debug)
 
     with open(dest, "wb") as f:
         f.write(bytearray(primeraParte))
@@ -231,7 +261,7 @@ def process(args: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.',
+    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output. For some errors use --quantize option',
                                      epilog="This is not too eficient and could be improbed, but works.")
     parser.add_argument('--dirs', '-d', required=True, type=str, nargs='+',
                         help='Relative paths for images or folders with images to convert, separed with a space ex: --dirs img1.bmp path1/')
@@ -239,7 +269,7 @@ if __name__ == "__main__":
                         help='Output folder for the images.')
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--progress', '-p',  action='store_true')
-    parser.add_argument('-q', '--quantize', action='store_true',
+    parser.add_argument('--quantize', '-q',  action='store_true',
                         help="Use pillow's quantize method instead of convert method for reduce colors")
     args = parser.parse_args()
     process(args)
