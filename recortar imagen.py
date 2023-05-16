@@ -70,9 +70,9 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
 def process(args: argparse.Namespace):
     imgPaths = []
     imgFolderPaths = []
+    dicImgPaths = {}
 
     for dir in args.dirs:
-        print(dir)
 
         if Path(dir).is_file():
             imgPaths.append(dir)
@@ -84,6 +84,16 @@ def process(args: argparse.Namespace):
             except ValueError:
                 print(f"'{dir}' is not a real file or path")
                 raise
+
+    for path in imgPaths:
+        aux = path.split("_")
+        nombre, end = "_".join(aux[:-1]), aux[-1]
+        if dicImgPaths.get(nombre) == None:
+            dicImgPaths[nombre] = []
+        dicImgPaths[nombre].append(path)
+
+    for nombre in dicImgPaths:
+        dicImgPaths[nombre].sort()
 
 
 tiles = []
@@ -97,7 +107,8 @@ if __name__ == "__main__":
                         help='build folder path')
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
-    args = parser.parse_args(['-d', "t", "1", '2'])
+    args = parser.parse_args(['-d', "animacion/tiles2_0.bmp", "animacion/tiles2_2.bmp", "animacion/tiles2_1.bmp",
+                             "animacion/tiles_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp"])
     process(args)
     tiles.clear()
     mapa.clear()
