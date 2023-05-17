@@ -247,6 +247,8 @@ pyrightconfig.json
 settings.json
 build
 notas
+animacion
+test.py
 
 *.elf
 *.gba

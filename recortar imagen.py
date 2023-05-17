@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 
 
-def igual(img1, img2):
+def igual(img1: Image, img2: Image):
     diferencia = ImageChops.subtract_modulo(img1, img2)
     arr = np.asarray(diferencia)
     if (np.count_nonzero(arr) == 0):
@@ -14,7 +14,7 @@ def igual(img1, img2):
         return False
 
 
-def crearTiles(img):
+def crearTiles(img: Image):
     alto = img.height//8
     ancho = img.width//8
 
@@ -32,6 +32,8 @@ def crearTiles(img):
             else:
                 mapa.append(len(tiles))
                 tiles.append(tileActual)
+    frames.append(mapa.copy())
+    mapa.clear()
 
 
 def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
@@ -65,9 +67,11 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write(f'    "bpp_mode": "bpp_{bpp}",\n')
         archivoJson.write(f'    "colors_count": {colores}\n')
         archivoJson.write('}\n')
+    tiles.clear()
 
 
 def process(args: argparse.Namespace):
+    global frames
     imgPaths = []
     imgFolderPaths = []
     dicImgPaths = {}
@@ -87,7 +91,7 @@ def process(args: argparse.Namespace):
 
     for path in imgPaths:
         aux = path.split("_")
-        nombre, end = "_".join(aux[:-1]), aux[-1]
+        nombre = "_".join(aux[:-1])
         if dicImgPaths.get(nombre) == None:
             dicImgPaths[nombre] = []
         dicImgPaths[nombre].append(path)
@@ -95,9 +99,18 @@ def process(args: argparse.Namespace):
     for nombre in dicImgPaths:
         dicImgPaths[nombre].sort()
 
+    for ImgPaths in dicImgPaths:
+        frames = []
+        for imgPath in dicImgPaths[ImgPaths]:
+            with Image.open(imgPath) as image:
+                crearTiles(image)
+
+        guardarTilemap(ImgPaths)
+
 
 tiles = []
 mapa = []
+frames = []
 
 debug = False
 
@@ -108,7 +121,7 @@ if __name__ == "__main__":
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
     args = parser.parse_args(['-d', "animacion/tiles2_0.bmp", "animacion/tiles2_2.bmp", "animacion/tiles2_1.bmp",
-                             "animacion/tiles_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp"])
+                             "animacion/tiles_0.bmp","animacion/mapa_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp"])
     process(args)
     tiles.clear()
     mapa.clear()
