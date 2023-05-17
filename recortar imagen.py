@@ -101,11 +101,13 @@ def process(args: argparse.Namespace):
 
     for ImgPaths in dicImgPaths:
         frames = []
+        outputDir = Path(args.build).joinpath(ImgPaths)
+        outputDir.parent.mkdir(exist_ok=True, parents=True)
         for imgPath in dicImgPaths[ImgPaths]:
             with Image.open(imgPath) as image:
                 crearTiles(image)
 
-        guardarTilemap(ImgPaths)
+        guardarTilemap(outputDir.__str__())
 
 
 tiles = []
@@ -121,7 +123,7 @@ if __name__ == "__main__":
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
     args = parser.parse_args(['-d', "animacion/tiles2_0.bmp", "animacion/tiles2_2.bmp", "animacion/tiles2_1.bmp",
-                             "animacion/tiles_0.bmp","animacion/mapa_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp"])
+                             "animacion/tiles_0.bmp", "animacion/mapa_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp", "-b", "build"])
     process(args)
     tiles.clear()
     mapa.clear()
