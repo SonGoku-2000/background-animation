@@ -32,7 +32,8 @@ PYTHON      :=  python3
 SOURCES     :=  src
 INCLUDES    :=  include
 DATA        :=
-GRAPHICS    :=  graphics
+USERBUILD   :=  external_tool
+GRAPHICS    :=  graphics $(USERBUILD)/animacion
 AUDIO       :=  audio
 DMGAUDIO    :=  dmg_audio
 ROMTITLE    :=  <FTName | capitalize>
@@ -42,7 +43,6 @@ USERASFLAGS :=
 USERLDFLAGS :=  
 USERLIBDIRS :=  
 USERLIBS    :=  
-USERBUILD   :=  $(BUILD)/user
 EXTTOOL     :=  @$(PYTHON) -B python-script.py --build=$(USERBUILD)
 
 #---------------------------------------------------------------------------------------------------------------------

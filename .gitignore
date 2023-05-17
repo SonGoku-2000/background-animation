@@ -249,6 +249,7 @@ build
 notas
 animacion
 test.py
+external_tool
 
 *.elf
 *.gba

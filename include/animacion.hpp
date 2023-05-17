@@ -7,7 +7,7 @@
 #include "bn_regular_bg_map_ptr.h"
 #include "bn_regular_bg_map_cell_info.h"
 
-#include "bn_bg_palette_items_palette.h"
+//#include "bn_bg_palette_items_palette.h"
 #include "bn_regular_bg_tiles_items_tiles2.h"
 #include "bn_bg_palette_items_tiles2_palette.h"
 
