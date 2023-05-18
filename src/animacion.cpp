@@ -5,9 +5,9 @@
 
 #include "bn_log.h"
 namespace bn {
-    namespace anim {
+    namespace animation {
 
-        Animacion::Animacion(int wait_updates) :
+        Animation::Animation(int wait_updates) :
             map_item(cells[0], bn::size(columns, rows)),
             bg_item(bn::regular_bg_tiles_items::tiles2,
                 bn::bg_palette_items::tiles2_palette,
@@ -19,7 +19,7 @@ namespace bn {
             bg_map.reload_cells_ref();
         }
 
-        void Animacion::update() {
+        void Animation::update() {
             if (cont < wait) {
                 cont++;
                 return;
@@ -33,7 +33,7 @@ namespace bn {
                 bn::memory::copy(patron2[0], cells_count, cells[0]);
             }
             else {
-                BN_LOG("error frame no contavilizado");
+                BN_LOG("error frame no contabilizado");
             }
 
             frameActual++;
@@ -45,7 +45,7 @@ namespace bn {
             bg_map.reload_cells_ref();
         }
 
-        void Animacion::reset() {
+        void Animation::reset() {
             bn::memory::copy(patron1[0], cells_count, cells[0]);
         }
     }
