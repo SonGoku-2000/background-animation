@@ -34,6 +34,7 @@ def crearTiles(img: Image):
                 tiles.append(tileActual)
     frames.append(mapa.copy())
     mapa.clear()
+    return alto, ancho
 
 
 def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
@@ -99,15 +100,79 @@ def process(args: argparse.Namespace):
     for nombre in dicImgPaths:
         dicImgPaths[nombre].sort()
 
-    for ImgPaths in dicImgPaths:
+    includeFolderPath = Path(args.build).joinpath("include")
+    includeFolderPath.mkdir(exist_ok=True, parents=True)
+    srcFolderPath = Path(args.build).joinpath("src")
+    srcFolderPath.mkdir(exist_ok=True, parents=True)
+
+    for animacionName in dicImgPaths:
         frames = []
-        outputDir = Path(args.build).joinpath(ImgPaths)
+        outputDir = Path(args.build).joinpath(animacionName)
         outputDir.parent.mkdir(exist_ok=True, parents=True)
-        for imgPath in dicImgPaths[ImgPaths]:
+        for imgPath in dicImgPaths[animacionName]:
             with Image.open(imgPath) as image:
-                crearTiles(image)
+                alto,ancho = crearTiles(image)
 
         guardarTilemap(outputDir.__str__())
+
+        output_header_path = outputDir.__str__() + ".hpp"
+        output_cpp_path = outputDir.__str__() + ".cpp"
+        print(animacionName)
+        with open(output_header_path, 'w') as output_header:
+            output_header.write(f'#ifndef {outputDir.name.upper()}_HPP \n')
+            output_header.write(f'#define {outputDir.name.upper()}_HPP \n')
+            output_header.write('\n')
+            output_header.write('#include "bn_memory.h" \n')
+            output_header.write('#include "bn_regular_bg_ptr.h" \n')
+            output_header.write('#include "bn_regular_bg_item.h" \n')
+            output_header.write('#include "bn_regular_bg_map_ptr.h" \n')
+            output_header.write('#include "bn_regular_bg_map_cell_info.h" \n')
+            output_header.write(
+                f'#include "bn_regular_bg_tiles_items_{outputDir.name}.h" \n')
+            output_header.write(
+                f'#include "bn_bg_palette_items_{outputDir.name}_palette.h" \n')
+            output_header.write('namespace bn { \n')
+            output_header.write('   namespace animation { \n')
+            for i, frame in enumerate(frames):
+                output_header.write(
+                    f'        constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
+                output_header.write(f'          {str(frame)[1:-1]}\n')
+                output_header.write('        }; \n')
+
+            output_header.write('\n')
+            output_header.write('       struct Animation { \n')
+            output_header.write(f'            static constexpr int columns = {ancho}; \n')
+            output_header.write(f'            static constexpr int rows = {alto}; \n')
+            output_header.write('            static constexpr int cells_count = columns * rows; \n')
+            output_header.write('\n')
+            output_header.write('            int wait; \n')
+            output_header.write('\n')
+            output_header.write('            int cont = 1; \n')
+            output_header.write('\n')
+            output_header.write('            int frameActual = 0; \n')
+            output_header.write('\n')
+            output_header.write(f'            int framesTotales = {len(frames)}; \n')
+            output_header.write('\n')
+            output_header.write('            Animation(int wait_updates); \n')
+            output_header.write('\n')
+            output_header.write('            alignas(int) bn::regular_bg_map_cell cells[cells_count]; \n')
+            output_header.write('            bn::regular_bg_map_item map_item; \n')
+            output_header.write('\n')
+            output_header.write('            bn::regular_bg_item bg_item; \n')
+            output_header.write('\n')
+            output_header.write('            bn::regular_bg_ptr bg; \n')
+            output_header.write('\n')
+            output_header.write('            bn::regular_bg_map_ptr bg_map; \n')
+            output_header.write('\n')
+            output_header.write('            void update(); \n')
+            output_header.write('\n')
+            output_header.write('            void reset(); \n')
+            output_header.write('        }; \n')
+            output_header.write('    } \n')
+            output_header.write('} \n')
+            output_header.write('#endif' + '\n')
+            output_header.write('\n')
+
 
 
 tiles = []
@@ -123,7 +188,7 @@ if __name__ == "__main__":
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
     args = parser.parse_args(['-d', "animacion/tiles2_0.bmp", "animacion/tiles2_2.bmp", "animacion/tiles2_1.bmp",
-                             "animacion/tiles_0.bmp", "animacion/mapa_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp", "-b", "build"])
+                             "animacion/tiles_0.bmp", "animacion/mapa_0.bmp", "animacion/tiles_2.bmp", "animacion/tiles_1.bmp", "-b", "external_tool"])
     process(args)
     tiles.clear()
     mapa.clear()
