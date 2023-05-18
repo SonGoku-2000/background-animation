@@ -93,6 +93,7 @@ def process(args: argparse.Namespace):
     for path in imgPaths:
         aux = path.split("_")
         nombre = "_".join(aux[:-1])
+        nombre = Path(nombre).name
         if dicImgPaths.get(nombre) == None:
             dicImgPaths[nombre] = []
         dicImgPaths[nombre].append(path)
@@ -100,42 +101,41 @@ def process(args: argparse.Namespace):
     for nombre in dicImgPaths:
         dicImgPaths[nombre].sort()
 
-    includeFolderPath = Path(args.build).joinpath("include")
-    includeFolderPath.mkdir(exist_ok=True, parents=True)
-    srcFolderPath = Path(args.build).joinpath("src")
-    srcFolderPath.mkdir(exist_ok=True, parents=True)
+    outputIncludeFolderPath = Path(args.build).joinpath("include")
+    outputIncludeFolderPath.mkdir(exist_ok=True, parents=True)
+    outputSrcFolderPath = Path(args.build).joinpath("src")
+    outputSrcFolderPath.mkdir(exist_ok=True, parents=True)
+    outputGraphicsForderPath = Path(args.build).joinpath("graphics")
+    outputGraphicsForderPath.mkdir(exist_ok=True, parents=True)
 
     for animacionName in dicImgPaths:
         frames = []
-        outputDir = Path(args.build).joinpath(animacionName)
-        outputDir.parent.mkdir(exist_ok=True, parents=True)
+        outputGraphicsDir = outputGraphicsForderPath.joinpath(animacionName)
         for imgPath in dicImgPaths[animacionName]:
             with Image.open(imgPath) as image:
                 alto, ancho = crearTiles(image)
 
-        guardarTilemap(outputDir.__str__())
+        guardarTilemap(outputGraphicsDir.__str__())
 
-        output_header_path = outputDir.__str__() + ".hpp"
-        output_cpp_path = outputDir.__str__() + ".cpp"
+        output_header_path = outputIncludeFolderPath.joinpath(animacionName).__str__() + ".hpp"
+        output_cpp_path = outputSrcFolderPath.joinpath(animacionName).__str__() + ".cpp"
         print(animacionName)
         with open(output_header_path, 'w') as output_header:
-            output_header.write(f'#ifndef {outputDir.name.upper()}_HPP \n')
-            output_header.write(f'#define {outputDir.name.upper()}_HPP \n')
+            output_header.write(f'#ifndef {animacionName.upper()}_HPP \n')
+            output_header.write(f'#define {animacionName.upper()}_HPP \n')
             output_header.write('\n')
             output_header.write('#include "bn_memory.h" \n')
             output_header.write('#include "bn_regular_bg_ptr.h" \n')
             output_header.write('#include "bn_regular_bg_item.h" \n')
             output_header.write('#include "bn_regular_bg_map_ptr.h" \n')
             output_header.write('#include "bn_regular_bg_map_cell_info.h" \n')
-            output_header.write(
-                f'#include "bn_regular_bg_tiles_items_{outputDir.name}.h" \n')
-            output_header.write(
-                f'#include "bn_bg_palette_items_{outputDir.name}_palette.h" \n')
+            output_header.write(f'#include "bn_regular_bg_tiles_items_{animacionName}.h" \n')
+            output_header.write(f'#include "bn_bg_palette_items_{animacionName}_palette.h" \n')
             output_header.write('namespace bn { \n')
             output_header.write('   namespace animation { \n')
             for i, frame in enumerate(frames):
                 output_header.write(
-                    f'        constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
+                                f'        constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
                 output_header.write(f'          {str(frame)[1:-1]}\n')
                 output_header.write('        }; \n')
 
@@ -174,7 +174,7 @@ def process(args: argparse.Namespace):
             output_header.write('\n')
 
         with open(output_cpp_path, 'w') as output_cpp:
-            output_cpp.write(f'#include "{outputDir.name}.hpp" \n')
+            output_cpp.write(f'#include "{animacionName}.hpp" \n')
             output_cpp.write('\n')
             output_cpp.write('namespace bn { \n')
             output_cpp.write('    namespace animation { \n')
@@ -202,12 +202,15 @@ def process(args: argparse.Namespace):
             for i in range(len(frames)):
                 if i == 0:
                     output_cpp.write('            if (frameActual == 0) { \n')
-                    output_cpp.write('                bn::memory::copy(frame0[0], cells_count, cells[0]); \n')
+                    output_cpp.write(
+                            '                bn::memory::copy(frame0[0], cells_count, cells[0]); \n')
                     output_cpp.write('            } \n')
                     continue
 
-                output_cpp.write(f'            else if (frameActual == {i}) {"{"} \n')
-                output_cpp.write(f'                bn::memory::copy(frame{0}[0], cells_count, cells[0]); \n')
+                output_cpp.write(
+                        f'            else if (frameActual == {i}) {"{"} \n')
+                output_cpp.write(
+                        f'                bn::memory::copy(frame{0}[0], cells_count, cells[0]); \n')
                 output_cpp.write('            } \n')
             output_cpp.write('\n')
             output_cpp.write('            frameActual++; \n')
