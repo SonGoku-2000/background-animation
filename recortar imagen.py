@@ -57,7 +57,8 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write(f'    "compression": "{compresion}"\n')
         archivoJson.write('}\n')
 
-    paleta = tiles[0]
+    paleta = tilemap.crop((0, 0, 8, 8))
+    #paleta = tiles[0]
     paleta = paleta.convert(
         "P", palette=Image.Palette.ADAPTIVE, colors=colores)
     paleta.save(path+"_palette.bmp")
