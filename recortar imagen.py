@@ -111,7 +111,7 @@ def process(args: argparse.Namespace):
         outputDir.parent.mkdir(exist_ok=True, parents=True)
         for imgPath in dicImgPaths[animacionName]:
             with Image.open(imgPath) as image:
-                alto,ancho = crearTiles(image)
+                alto, ancho = crearTiles(image)
 
         guardarTilemap(outputDir.__str__())
 
@@ -173,6 +173,57 @@ def process(args: argparse.Namespace):
             output_header.write('#endif' + '\n')
             output_header.write('\n')
 
+        with open(output_cpp_path, 'w') as output_cpp:
+            output_cpp.write(f'#include "{outputDir.name}.hpp" \n')
+            output_cpp.write('\n')
+            output_cpp.write('namespace bn { \n')
+            output_cpp.write('    namespace animation { \n')
+            output_cpp.write('\n')
+            output_cpp.write('        Animation::Animation(int wait_updates) : \n')
+            output_cpp.write('            map_item(cells[0], bn::size(columns, rows)), \n')
+            output_cpp.write('            bg_item(bn::regular_bg_tiles_items::tiles2, \n')
+            output_cpp.write('                bn::bg_palette_items::tiles2_palette, \n')
+            output_cpp.write('                map_item), \n')
+            output_cpp.write('            bg(bg_item.create_bg(0, 0)), \n')
+            output_cpp.write('            bg_map(bg.map()) { \n')
+            output_cpp.write('\n')
+            output_cpp.write('            wait = wait_updates; \n')
+            output_cpp.write('            bg_map.reload_cells_ref(); \n')
+            output_cpp.write('        } \n')
+            output_cpp.write('\n')
+            output_cpp.write('        void Animation::update() { \n')
+            output_cpp.write('            if (cont < wait) { \n')
+            output_cpp.write('                cont++; \n')
+            output_cpp.write('                return; \n')
+            output_cpp.write('            } \n')
+            output_cpp.write('            cont = 1; \n')
+            output_cpp.write('\n')
+
+            for i in range(len(frames)):
+                if i == 0:
+                    output_cpp.write('            if (frameActual == 0) { \n')
+                    output_cpp.write('                bn::memory::copy(frame0[0], cells_count, cells[0]); \n')
+                    output_cpp.write('            } \n')
+                    continue
+
+                output_cpp.write(f'            else if (frameActual == {i}) {"{"} \n')
+                output_cpp.write(f'                bn::memory::copy(frame{0}[0], cells_count, cells[0]); \n')
+                output_cpp.write('            } \n')
+            output_cpp.write('\n')
+            output_cpp.write('            frameActual++; \n')
+            output_cpp.write('\n')
+            output_cpp.write('            if (frameActual > framesTotales) { \n')
+            output_cpp.write('                frameActual = 0; \n')
+            output_cpp.write('            } \n')
+            output_cpp.write('\n')
+            output_cpp.write('            bg_map.reload_cells_ref(); \n')
+            output_cpp.write('        } \n')
+            output_cpp.write('\n')
+            output_cpp.write('        void Animation::reset() { \n')
+            output_cpp.write('            bn::memory::copy(frame0[0], cells_count, cells[0]); \n')
+            output_cpp.write('        } \n')
+            output_cpp.write('    } \n')
+            output_cpp.write('} \n')
 
 
 tiles = []
