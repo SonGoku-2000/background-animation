@@ -119,19 +119,27 @@ def process(args: argparse.Namespace):
     outputGraphicsForderPath.mkdir(exist_ok=True, parents=True)
 
     for animacionName in dicImgPaths:
+        if(args.verbose):
+            print(f'Procesing animation: "{animacionName}"')
+
         frames = []
         outputGraphicsDir = outputGraphicsForderPath.joinpath(animacionName)
         for imgPath in dicImgPaths[animacionName]:
+            if(args.verbose):
+                print(f'Procesing file: "{imgPath}"')
             with Image.open(imgPath) as image:
                 alto, ancho = crearTiles(image)
 
-        guardarTilemap(outputGraphicsDir.__str__(), args.bpp)
+        guardarTilemap(outputGraphicsDir.__str__(),args.bpp)
 
         output_header_path = outputIncludeFolderPath.joinpath(
             animacionName).__str__() + ".hpp"
         output_cpp_path = outputSrcFolderPath.joinpath(
             animacionName).__str__() + ".cpp"
-        print(animacionName)
+        
+        if(args.verbose):
+            print(f'Procesing header file: "{output_header_path}"')
+
         with open(output_header_path, 'w') as output_header:
             output_header.write(f'#ifndef {animacionName.upper()}_HPP \n')
             output_header.write(f'#define {animacionName.upper()}_HPP \n')
@@ -199,6 +207,12 @@ def process(args: argparse.Namespace):
             output_header.write('#endif' + '\n')
             output_header.write('\n')
 
+        if(args.verbose):
+            print("Header file writen")
+
+        if(args.verbose):
+            print(f'Procesing src file: "{output_cpp_path}"')
+
         with open(output_cpp_path, 'w') as output_cpp:
             output_cpp.write(f'#include "{animacionName}.hpp" \n')
             output_cpp.write('\n')
@@ -261,6 +275,8 @@ def process(args: argparse.Namespace):
             output_cpp.write('    } \n')
             output_cpp.write('} \n')
 
+        if(args.verbose):
+            print("Src file writen\n\n")
 
 tiles = []
 mapa = []
@@ -274,8 +290,10 @@ if __name__ == "__main__":
                         help='build folder path')
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
-    parser.add_argument('--bpp', type=int)
-    args = parser.parse_args()
+    parser.add_argument('--bpp',type=int)
+    parser.add_argument('--verbose', '-v', action='store_true')
+
+    args = parser.parse_args(['--bpp','8','-d','animacion','-b','external_tool'])
     process(args)
     tiles.clear()
     mapa.clear()
