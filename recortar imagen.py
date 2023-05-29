@@ -98,6 +98,16 @@ def process(args: argparse.Namespace):
             dicImgPaths[nombre] = []
         dicImgPaths[nombre].append(path)
 
+    for folder in imgFolderPaths:
+        for path in Path(folder).iterdir():
+            path = path.__str__()
+            aux = path.split("_")
+            nombre = "_".join(aux[:-1])
+            nombre = Path(nombre).name
+            if dicImgPaths.get(nombre) == None:
+                dicImgPaths[nombre] = []
+            dicImgPaths[nombre].append(path)
+
     for nombre in dicImgPaths:
         dicImgPaths[nombre].sort()
 
@@ -117,8 +127,10 @@ def process(args: argparse.Namespace):
 
         guardarTilemap(outputGraphicsDir.__str__())
 
-        output_header_path = outputIncludeFolderPath.joinpath(animacionName).__str__() + ".hpp"
-        output_cpp_path = outputSrcFolderPath.joinpath(animacionName).__str__() + ".cpp"
+        output_header_path = outputIncludeFolderPath.joinpath(
+            animacionName).__str__() + ".hpp"
+        output_cpp_path = outputSrcFolderPath.joinpath(
+            animacionName).__str__() + ".cpp"
         print(animacionName)
         with open(output_header_path, 'w') as output_header:
             output_header.write(f'#ifndef {animacionName.upper()}_HPP \n')
@@ -129,24 +141,30 @@ def process(args: argparse.Namespace):
             output_header.write('#include "bn_regular_bg_item.h" \n')
             output_header.write('#include "bn_regular_bg_map_ptr.h" \n')
             output_header.write('#include "bn_regular_bg_map_cell_info.h" \n')
-            output_header.write(f'#include "bn_regular_bg_tiles_items_{animacionName}.h" \n')
-            output_header.write(f'#include "bn_bg_palette_items_{animacionName}_palette.h" \n')
+            output_header.write(
+                f'#include "bn_regular_bg_tiles_items_{animacionName}.h" \n')
+            output_header.write(
+                f'#include "bn_bg_palette_items_{animacionName}_palette.h" \n')
             output_header.write('\n')
             output_header.write('namespace bn { \n')
-            output_header.write('   namespace animation { \n')
-            output_header.write(f'       namespace {animacionName}_data {"{"} \n')
+            output_header.write('    namespace animation { \n')
+            output_header.write(
+                f'        namespace {animacionName}_data {"{"} \n')
             for i, frame in enumerate(frames):
                 output_header.write(
-                                   f'           constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
+                    f'            constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
                 output_header.write(f'               {str(frame)[1:-1]}\n')
-                output_header.write('           }; \n')
+                output_header.write('            }; \n')
             output_header.write('        }\n')
 
             output_header.write('\n')
             output_header.write(f'       struct {animacionName} {"{"} \n')
-            output_header.write(f'            static constexpr int columns = {ancho}; \n')
-            output_header.write(f'            static constexpr int rows = {alto}; \n')
-            output_header.write('            static constexpr int cells_count = columns * rows; \n')
+            output_header.write(
+                f'            static constexpr int columns = {ancho}; \n')
+            output_header.write(
+                f'            static constexpr int rows = {alto}; \n')
+            output_header.write(
+                '            static constexpr int cells_count = columns * rows; \n')
             output_header.write('\n')
             output_header.write('            int wait; \n')
             output_header.write('\n')
@@ -154,18 +172,23 @@ def process(args: argparse.Namespace):
             output_header.write('\n')
             output_header.write('            int frameActual = 0; \n')
             output_header.write('\n')
-            output_header.write(f'            int framesTotales = {len(frames)}; \n')
+            output_header.write(
+                f'            int framesTotales = {len(frames)}; \n')
             output_header.write('\n')
-            output_header.write(f'            {animacionName}(int wait_updates); \n')
+            output_header.write(
+                f'            {animacionName}(int wait_updates); \n')
             output_header.write('\n')
-            output_header.write('            alignas(int) bn::regular_bg_map_cell cells[cells_count]; \n')
-            output_header.write('            bn::regular_bg_map_item map_item; \n')
+            output_header.write(
+                '            alignas(int) bn::regular_bg_map_cell cells[cells_count]; \n')
+            output_header.write(
+                '            bn::regular_bg_map_item map_item; \n')
             output_header.write('\n')
             output_header.write('            bn::regular_bg_item bg_item; \n')
             output_header.write('\n')
             output_header.write('            bn::regular_bg_ptr bg; \n')
             output_header.write('\n')
-            output_header.write('            bn::regular_bg_map_ptr bg_map; \n')
+            output_header.write(
+                '            bn::regular_bg_map_ptr bg_map; \n')
             output_header.write('\n')
             output_header.write('            void update(); \n')
             output_header.write('\n')
@@ -182,11 +205,15 @@ def process(args: argparse.Namespace):
             output_cpp.write('namespace bn { \n')
             output_cpp.write('    namespace animation { \n')
             output_cpp.write('\n')
-            output_cpp.write(f'        {animacionName}::{animacionName}(int wait_updates) : \n')
-            output_cpp.write('            map_item(cells[0], bn::size(columns, rows)), \n')
-            output_cpp.write(f'            bg_item(bn::regular_bg_tiles_items::{animacionName}, \n')
-            output_cpp.write(f'                bn::bg_palette_items::{animacionName}_palette, \n')
-            output_cpp.write('                map_item), \n')
+            output_cpp.write(
+                f'        {animacionName}::{animacionName}(int wait_updates) : \n')
+            output_cpp.write(
+                '            map_item(cells[0], bn::size(columns, rows)), \n')
+            output_cpp.write(
+                f'            bg_item(bn::regular_bg_tiles_items::{animacionName}, \n')
+            output_cpp.write(
+                f'                    bn::bg_palette_items::{animacionName}_palette, \n')
+            output_cpp.write('                    map_item), \n')
             output_cpp.write('            bg(bg_item.create_bg(0, 0)), \n')
             output_cpp.write('            bg_map(bg.map()) { \n')
             output_cpp.write('\n')
@@ -194,7 +221,8 @@ def process(args: argparse.Namespace):
             output_cpp.write('            bg_map.reload_cells_ref(); \n')
             output_cpp.write('        } \n')
             output_cpp.write('\n')
-            output_cpp.write(f'        void {animacionName}::update() {"{"} \n')
+            output_cpp.write(
+                f'        void {animacionName}::update() {"{"} \n')
             output_cpp.write('            if (cont < wait) { \n')
             output_cpp.write('                cont++; \n')
             output_cpp.write('                return; \n')
@@ -206,19 +234,20 @@ def process(args: argparse.Namespace):
                 if i == 0:
                     output_cpp.write('            if (frameActual == 0) { \n')
                     output_cpp.write(
-                            f'                bn::memory::copy({animacionName}_data::frame0[0], cells_count, cells[0]); \n')
+                        f'                bn::memory::copy({animacionName}_data::frame0[0], cells_count, cells[0]); \n')
                     output_cpp.write('            } \n')
                     continue
 
                 output_cpp.write(
-                        f'            else if (frameActual == {i}) {"{"} \n')
+                    f'            else if (frameActual == {i}) {"{"} \n')
                 output_cpp.write(
-                        f'                bn::memory::copy({animacionName}_data::frame{i}[0], cells_count, cells[0]); \n')
+                    f'                bn::memory::copy({animacionName}_data::frame{i}[0], cells_count, cells[0]); \n')
                 output_cpp.write('            } \n')
             output_cpp.write('\n')
             output_cpp.write('            frameActual++; \n')
             output_cpp.write('\n')
-            output_cpp.write('            if (frameActual > framesTotales) { \n')
+            output_cpp.write(
+                '            if (frameActual > framesTotales) { \n')
             output_cpp.write('                frameActual = 0; \n')
             output_cpp.write('            } \n')
             output_cpp.write('\n')
@@ -226,7 +255,8 @@ def process(args: argparse.Namespace):
             output_cpp.write('        } \n')
             output_cpp.write('\n')
             output_cpp.write(f'        void {animacionName}::reset() {"{"} \n')
-            output_cpp.write(f'            bn::memory::copy({animacionName}_data::frame0[0], cells_count, cells[0]); \n')
+            output_cpp.write(
+                f'            bn::memory::copy({animacionName}_data::frame0[0], cells_count, cells[0]); \n')
             output_cpp.write('        } \n')
             output_cpp.write('    } \n')
             output_cpp.write('} \n')
@@ -244,8 +274,7 @@ if __name__ == "__main__":
                         help='build folder path')
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
-    args = parser.parse_args(['-d', 
-                             "animacion/mapa_0.bmp","animacion/mapa_1.bmp","-b", "external_tool"])
+    args = parser.parse_args()
     process(args)
     tiles.clear()
     mapa.clear()
