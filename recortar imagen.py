@@ -58,7 +58,6 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
         archivoJson.write('}\n')
 
     paleta = tilemap.crop((0, 0, 8, 8))
-    #paleta = tiles[0]
     paleta = paleta.convert(
         "P", palette=Image.Palette.ADAPTIVE, colors=colores)
     paleta.save(path+"_palette.bmp")
@@ -132,13 +131,16 @@ def process(args: argparse.Namespace):
             output_header.write('#include "bn_regular_bg_map_cell_info.h" \n')
             output_header.write(f'#include "bn_regular_bg_tiles_items_{animacionName}.h" \n')
             output_header.write(f'#include "bn_bg_palette_items_{animacionName}_palette.h" \n')
+            output_header.write('\n')
             output_header.write('namespace bn { \n')
             output_header.write('   namespace animation { \n')
+            output_header.write(f'       namespace {animacionName}_data {"{"} \n')
             for i, frame in enumerate(frames):
                 output_header.write(
-                                f'        constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
-                output_header.write(f'          {str(frame)[1:-1]}\n')
-                output_header.write('        }; \n')
+                                   f'           constexpr bn::regular_bg_map_cell frame{i}[] = {"{"} \n')
+                output_header.write(f'               {str(frame)[1:-1]}\n')
+                output_header.write('           }; \n')
+            output_header.write('        }\n')
 
             output_header.write('\n')
             output_header.write(f'       struct {animacionName} {"{"} \n')
@@ -204,14 +206,14 @@ def process(args: argparse.Namespace):
                 if i == 0:
                     output_cpp.write('            if (frameActual == 0) { \n')
                     output_cpp.write(
-                            f'                bn::memory::copy(frame0[0], cells_count, cells[0]); \n')
+                            f'                bn::memory::copy({animacionName}_data::frame0[0], cells_count, cells[0]); \n')
                     output_cpp.write('            } \n')
                     continue
 
                 output_cpp.write(
                         f'            else if (frameActual == {i}) {"{"} \n')
                 output_cpp.write(
-                        f'                bn::memory::copy(frame{i}[0], cells_count, cells[0]); \n')
+                        f'                bn::memory::copy({animacionName}_data::frame{i}[0], cells_count, cells[0]); \n')
                 output_cpp.write('            } \n')
             output_cpp.write('\n')
             output_cpp.write('            frameActual++; \n')
@@ -224,7 +226,7 @@ def process(args: argparse.Namespace):
             output_cpp.write('        } \n')
             output_cpp.write('\n')
             output_cpp.write(f'        void {animacionName}::reset() {"{"} \n')
-            output_cpp.write('            bn::memory::copy(frame0[0], cells_count, cells[0]); \n')
+            output_cpp.write(f'            bn::memory::copy({animacionName}_data::frame0[0], cells_count, cells[0]); \n')
             output_cpp.write('        } \n')
             output_cpp.write('    } \n')
             output_cpp.write('} \n')
