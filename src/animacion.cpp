@@ -1,4 +1,4 @@
-#include "animacion.hpp"
+/*#include "animacion.hpp"
 
 
 #include "bn_memory.h"
@@ -49,4 +49,4 @@ namespace bn {
             bn::memory::copy(patron1[0], cells_count, cells[0]);
         }
     }
-}
+}*/

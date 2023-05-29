@@ -1,4 +1,4 @@
-#ifndef ANIMACION_HPP
+/*#ifndef ANIMACION_HPP
 #define ANIMACION_HPP
 
 #include "bn_memory.h"
@@ -131,4 +131,4 @@ namespace bn {
         };
     }
 }
-#endif
+#endif*/
