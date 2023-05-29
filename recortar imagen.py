@@ -73,11 +73,18 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
 
 def process(args: argparse.Namespace):
     global frames
-    if args.compression not in ["none","lz77","run_length","huffman","auto"]:
+    if args.compression not in ("none","lz77","run_length","huffman","auto"):
         try:
             raise ValueError('Compression method not valid')
         except ValueError:
             print(f"'{args.compression}' is not a valid compresion method.")
+            raise
+    
+    if args.bpp not in (4,8):
+        try:
+            raise ValueError('bpp not valid')
+        except ValueError:
+            print(f"'{args.bpp}' is not a valid bpp value.")
             raise
 
     imgPaths = []
@@ -299,10 +306,10 @@ if __name__ == "__main__":
                         type=str, nargs='+', help='build folder path')
     parser.add_argument('--compression', "-c",default="none", required=False,
                         type=str, help='build folder path')
-    parser.add_argument('--bpp',type=int)
+    parser.add_argument('--bpp','--bpp_mode',type=int)
     parser.add_argument('--verbose', '-v', action='store_true')
 
-    args = parser.parse_args(['--bpp','8','-d','animacion','-b','external_tool',"-c",'lz77'])
+    args = parser.parse_args()
     process(args)
     tiles.clear()
     mapa.clear()
