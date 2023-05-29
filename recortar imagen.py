@@ -73,14 +73,14 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
 
 def process(args: argparse.Namespace):
     global frames
-    if args.compression not in ("none","lz77","run_length","huffman","auto"):
+    if args.compression not in ("none", "lz77", "run_length", "huffman", "auto"):
         try:
             raise ValueError('Compression method not valid')
         except ValueError:
             print(f"'{args.compression}' is not a valid compresion method.")
             raise
-    
-    if args.bpp not in (4,8):
+
+    if args.bpp not in (4, 8):
         try:
             raise ValueError('bpp not valid')
         except ValueError:
@@ -133,25 +133,25 @@ def process(args: argparse.Namespace):
     outputGraphicsForderPath.mkdir(exist_ok=True, parents=True)
 
     for animacionName in dicImgPaths:
-        if(args.verbose):
+        if (args.verbose):
             print(f'Procesing animation: "{animacionName}"')
 
         frames = []
         outputGraphicsDir = outputGraphicsForderPath.joinpath(animacionName)
         for imgPath in dicImgPaths[animacionName]:
-            if(args.verbose):
+            if (args.verbose):
                 print(f'Procesing file: "{imgPath}"')
             with Image.open(imgPath) as image:
                 alto, ancho = crearTiles(image)
 
-        guardarTilemap(outputGraphicsDir.__str__(),args.bpp,args.compression)
+        guardarTilemap(outputGraphicsDir.__str__(), args.bpp, args.compression)
 
         output_header_path = outputIncludeFolderPath.joinpath(
             animacionName).__str__() + ".hpp"
         output_cpp_path = outputSrcFolderPath.joinpath(
             animacionName).__str__() + ".cpp"
-        
-        if(args.verbose):
+
+        if (args.verbose):
             print(f'Procesing header file: "{output_header_path}"')
 
         with open(output_header_path, 'w') as output_header:
@@ -221,10 +221,10 @@ def process(args: argparse.Namespace):
             output_header.write('#endif' + '\n')
             output_header.write('\n')
 
-        if(args.verbose):
+        if (args.verbose):
             print("Header file writen")
 
-        if(args.verbose):
+        if (args.verbose):
             print(f'Procesing src file: "{output_cpp_path}"')
 
         with open(output_cpp_path, 'w') as output_cpp:
@@ -289,8 +289,9 @@ def process(args: argparse.Namespace):
             output_cpp.write('    } \n')
             output_cpp.write('} \n')
 
-        if(args.verbose):
+        if (args.verbose):
             print("Src file writen\n\n")
+
 
 tiles = []
 mapa = []
@@ -300,13 +301,14 @@ debug = False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='External tool example.')
-    parser.add_argument('--build', "-b", required=False,
+    parser.add_argument('--build', "-b", required=True,
                         help='build folder path')
-    parser.add_argument('--dirs', "-d", required=False,
-                        type=str, nargs='+', help='build folder path')
-    parser.add_argument('--compression', "-c",default="none", required=False,
-                        type=str, help='build folder path')
-    parser.add_argument('--bpp','--bpp_mode',type=int)
+    parser.add_argument('--dirs', "-d", required=True,
+                        type=str, nargs='+', help='Dirs for images or folder with images')
+    parser.add_argument('--compression', "-c", default="none", required=False,
+                        type=str, help='Compression method')
+    parser.add_argument('--bpp', '--bpp_mode', default=4,
+                        type=int, help='bpp mode for the color palette')
     parser.add_argument('--verbose', '-v', action='store_true')
 
     args = parser.parse_args()
