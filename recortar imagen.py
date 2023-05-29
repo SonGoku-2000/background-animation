@@ -73,6 +73,13 @@ def guardarTilemap(path="graphics/tiles2", bpp=4, compresion="none"):
 
 def process(args: argparse.Namespace):
     global frames
+    if args.compression not in ["none","lz77","run_length","huffman","auto"]:
+        try:
+            raise ValueError('Compression method not valid')
+        except ValueError:
+            print(f"'{args.compression}' is not a valid compresion method.")
+            raise
+
     imgPaths = []
     imgFolderPaths = []
     dicImgPaths = {}
@@ -130,7 +137,7 @@ def process(args: argparse.Namespace):
             with Image.open(imgPath) as image:
                 alto, ancho = crearTiles(image)
 
-        guardarTilemap(outputGraphicsDir.__str__(),args.bpp)
+        guardarTilemap(outputGraphicsDir.__str__(),args.bpp,args.compression)
 
         output_header_path = outputIncludeFolderPath.joinpath(
             animacionName).__str__() + ".hpp"
@@ -290,10 +297,12 @@ if __name__ == "__main__":
                         help='build folder path')
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
+    parser.add_argument('--compression', "-c",default="none", required=False,
+                        type=str, help='build folder path')
     parser.add_argument('--bpp',type=int)
     parser.add_argument('--verbose', '-v', action='store_true')
 
-    args = parser.parse_args(['--bpp','8','-d','animacion','-b','external_tool'])
+    args = parser.parse_args(['--bpp','8','-d','animacion','-b','external_tool',"-c",'lz77'])
     process(args)
     tiles.clear()
     mapa.clear()
