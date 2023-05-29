@@ -125,7 +125,7 @@ def process(args: argparse.Namespace):
             with Image.open(imgPath) as image:
                 alto, ancho = crearTiles(image)
 
-        guardarTilemap(outputGraphicsDir.__str__())
+        guardarTilemap(outputGraphicsDir.__str__(), args.bpp)
 
         output_header_path = outputIncludeFolderPath.joinpath(
             animacionName).__str__() + ".hpp"
@@ -274,6 +274,7 @@ if __name__ == "__main__":
                         help='build folder path')
     parser.add_argument('--dirs', "-d", required=False,
                         type=str, nargs='+', help='build folder path')
+    parser.add_argument('--bpp', type=int)
     args = parser.parse_args()
     process(args)
     tiles.clear()
