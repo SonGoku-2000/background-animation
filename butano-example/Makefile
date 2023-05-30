@@ -29,21 +29,22 @@ TARGET      :=  $(notdir $(CURDIR))
 BUILD       :=  build
 LIBBUTANO   :=  ../../butano
 PYTHON      :=  python3
-SOURCES     :=  src
-INCLUDES    :=  include
-DATA        :=
 USERBUILD   :=  external_tool
-GRAPHICS    :=  graphics $(USERBUILD)/animacion
+SOURCES     :=  src $(USERBUILD)/src
+INCLUDES    :=  include $(USERBUILD)/include
+DATA        :=
+GRAPHICS    :=  graphics $(USERBUILD)/graphics
+ANIMATIONS  :=  animations
 AUDIO       :=  audio
 DMGAUDIO    :=  dmg_audio
-ROMTITLE    :=  <FTName | capitalize>
+ROMTITLE    :=  ANIMATION
 ROMCODE     :=  SBTP
 USERFLAGS   :=  
 USERASFLAGS :=  
 USERLDFLAGS :=  
 USERLIBDIRS :=  
 USERLIBS    :=  
-EXTTOOL     :=  @$(PYTHON) -B python-script.py --build=$(USERBUILD)
+EXTTOOL     :=  @$(PYTHON) -B bg-animation.py --build=$(USERBUILD) --dirs=$(ANIMATIONS)
 
 #---------------------------------------------------------------------------------------------------------------------
 # Export absolute butano path:

@@ -243,11 +243,9 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,python,c++
 
 # Carpetas y archivos no importantes
-
 settings.json
 build
 notas
-animacion
 test.py
 external_tool
 
